@@ -1,24 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, ScrollView, View, Text, ImageBackground, Pressable } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchCategoriesAction } from '../redux/category/categoryAction';
-// import { categories } from '../../lib/data';
+import { categories } from '../../lib/data';
 
 const CategoriesList = ({ navigation }) => {
-  const dispatch = useDispatch();
-  const { categoriesList } = useSelector(state => state.category);
-  const [categories, setCategories] = useState(null);
-
-  useEffect(() => {
-    dispatch(fetchCategoriesAction());
-  }, []);
-
-  useEffect(() => {
-    if (categoriesList && categoriesList) {
-      setCategories(categoriesList);
-    }
-  }, [categoriesList]);
-
   return (
     <ScrollView style={styles.categoriesList} showsVerticalScrollIndicator={false}>
       { categories &&
