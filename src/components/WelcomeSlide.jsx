@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
 import Swiper from 'react-native-swiper';
 
 const WelcomeSlide = ({ text, image }) => {

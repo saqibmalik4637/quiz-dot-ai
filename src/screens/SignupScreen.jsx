@@ -1,9 +1,50 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, ScrollView, View, TextInput, Pressable, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, ScrollView, View, TextInput, Pressable, Alert, TouchableOpacity } from 'react-native';
+import { useSelector, useDispatch } from "react-redux";
+
+import {CountryPicker} from "react-native-country-codes-picker";
+
+import { fetchCurrentUserAction, createUserAction } from '../reducers/users/userAction';
+import { selectCurrentUser, selectFetchedCurrentUser, selectUserToken } from '../reducers/users/userSlice';
+
+import { fetchCarouselsAction } from '../reducers/carousels/carouselAction';
+import { selectCarousels } from '../reducers/carousels/carouselSlice';
 
 const SignupScreen = ({ navigation }) => {
-  const [name, setName] = useState('');
+  const dispatch = useDispatch();
+  const userToken = useSelector(selectUserToken);
+  const currentUser = useSelector(selectCurrentUser);
+  const fetchedCurrentUser = useSelector(selectFetchedCurrentUser);
+  const carousels = useSelector(selectCarousels);
+  const [fullname, setFullname] = useState('');
   const [age, setAge] = useState('');
+  const [countryCode, setCountryCode] = useState('');
+  const [countryName, setCountryName] = useState('');
+  const [showCountryPicker, setShowCountryPicker] = useState(false);
+
+  const redirectToHome = () => {
+    navigation.navigate('Home');
+  }
+
+  const handleSubmit = () => {
+    dispatch(createUserAction({
+      fullname: fullname,
+      age: age,
+      country_code: countryCode
+    }));
+  }
+
+  useEffect(() => {
+    if (userToken) {
+      dispatch(fetchCurrentUserAction());
+    }
+  }, [userToken]);
+
+  useEffect(() => {
+    if (fetchedCurrentUser && Object.keys(currentUser).length > 0) {
+      dispatch(fetchCarouselsAction());
+    }
+  }, [fetchedCurrentUser, currentUser]);
 
   return (
     <View  style={styles.container}>
@@ -24,8 +65,8 @@ const SignupScreen = ({ navigation }) => {
 
             <TextInput
               style={styles.textInput}
-              onChangeText={setName}
-              value={name}
+              onChangeText={setFullname}
+              value={fullname}
             />
           </View>
 
@@ -39,11 +80,36 @@ const SignupScreen = ({ navigation }) => {
               keyboardType="numeric"
             />
           </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.screenForm.text}>Country</Text>
+
+            <TouchableOpacity
+              onPress={() => setShowCountryPicker(true)}
+              style={styles.textInput}
+            >
+              <Text style={{fontSize: 18}}>
+                {countryName}
+              </Text>
+            </TouchableOpacity>
+
+            <CountryPicker
+              style={{paddingTop: 50}}
+              show={showCountryPicker}
+              // when picker button press you will get the country object with dial code
+              pickerButtonOnPress={(item) => {
+                setCountryCode(item.code);
+                setCountryName(item.name.en);
+                setShowCountryPicker(false);
+              }}
+              popularCountries={['en', 'in', 'us']}
+            />
+          </View>
         </View>
 
         <Pressable
           style={[styles.primaryButton, styles.buttonShadow]}
-          onPress={() => navigation.navigate('Home')}>
+          onPress={handleSubmit}>
           <Text style={styles.primaryButtonText}>Let's play</Text>
         </Pressable>
       </ScrollView>
@@ -101,6 +167,7 @@ const styles = StyleSheet.create({
     width: '100%',
     borderBottomWidth: 1,
     borderBottomColor: '#35095c',
+    justifyContent: 'center'
   },
 
   primaryButton: {

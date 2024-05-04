@@ -1,8 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, ScrollView, View, Text, ImageBackground, Pressable } from 'react-native';
-import { categories } from '../../lib/data';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchCategoriesAction } from '../reducers/categories/categoryAction';
+import { selectCategories } from '../reducers/categories/categorySlice';
 
-const CategoriesList = ({ navigation }) => {
+const CategoriesList = ({ navigation, query }) => {
+  const categories = useSelector(selectCategories);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchCategoriesAction(query));
+  }, [dispatch, fetchCategoriesAction])
+
   return (
     <ScrollView style={styles.categoriesList} showsVerticalScrollIndicator={false}>
       { categories &&
@@ -10,7 +19,7 @@ const CategoriesList = ({ navigation }) => {
           {
             categories.map((category, i) => {
               return (
-                <Pressable style={styles.imageContainer} key={i} onPress={() => navigation.navigate('Category', { category: category })}>
+                <Pressable style={styles.imageContainer} key={i} onPress={() => navigation.navigate('Quizzes', { category: category })}>
                   <ImageBackground
                     style={styles.image}
                     imageStyle={{ borderRadius: 20 }}
@@ -48,8 +57,6 @@ const styles = StyleSheet.create({
   },
 
   image: {
-    
-    
     justifyContent: 'flex-end',
     height: 120,
     borderRadius: 20,
@@ -70,7 +77,7 @@ const styles = StyleSheet.create({
 
   text: {
     color: '#000000',
-    fontSize: 20,
+    fontSize: 10,
     fontWeight: 'bold',
     textAlign: 'left',
   },

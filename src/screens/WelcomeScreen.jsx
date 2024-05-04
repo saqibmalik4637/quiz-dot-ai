@@ -38,9 +38,9 @@ const WelcomeScreen = ({ navigation }) => {
           <Text style={styles.primaryButtonText}>GET STARTED</Text>
         </Pressable>
 
-        <Pressable style={[styles.primaryButtonInvert, styles.buttonShadow]} onPress={() => Alert.alert('I ALREADY HAVE AN ACCOUNT')}>
-          <Text style={styles.primaryButtonInvertText}>I ALREADY HAVE AN ACCOUNT</Text>
-        </Pressable>
+        {/*<Pressable style={[styles.primaryButtonInvert, styles.buttonShadow]} onPress={() => Alert.alert('I ALREADY HAVE AN ACCOUNT')}>*/}
+          {/*<Text style={styles.primaryButtonInvertText}>I ALREADY HAVE AN ACCOUNT</Text>*/}
+        {/*</Pressable>*/}
       </View>
     </View>
   );

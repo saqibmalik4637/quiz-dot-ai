@@ -1,17 +1,21 @@
 import { StyleSheet, View, Image, Text } from 'react-native';
 import Header from '../components/Header';
-import QuizesList from '../components/QuizesList';
+import QuizzesList from '../components/QuizzesList';
 
-const QuizCategory = ({ route, navigation }) => {
+const QuizzesScreen = ({ route, navigation }) => {
   return (
     <View style={styles.container}>
-      <Header />
-      <Image style={styles.bannerImage} source={route.params.category.image} />
-      <View style={styles.details}>
-        <Text style={styles.text}>{route.params.category.name}</Text>
-        <Text style={styles.text}>15 quizes</Text>
-      </View>
-      <QuizesList navigation={navigation} />
+      <Header navigation={navigation} title={route.params.title} />
+      { route.params.category ? <>
+        <Image style={styles.bannerImage} source={route.params.category.image} />
+        <View style={styles.details}>
+          <Text style={styles.text}>{route.params.category.name}</Text>
+          <Text style={styles.text}>{route.params.category.quizzes_count} quizzes</Text>
+        </View>
+        <QuizzesList navigation={navigation} category={route.params.category} />
+      </> : <>
+        <QuizzesList navigation={navigation} query={route.params.query} />
+      </> }
     </View>
   )
 };
@@ -49,4 +53,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default QuizCategory;
+export default QuizzesScreen;

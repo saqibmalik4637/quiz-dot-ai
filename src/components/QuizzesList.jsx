@@ -1,20 +1,34 @@
 import { StyleSheet, ScrollView, View, Pressable, Text, Image } from 'react-native';
-import { quizes } from '../../lib/data';
+import { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchQuizzesAction } from '../reducers/quizzes/quizAction';
+import { selectQuizzes } from '../reducers/quizzes/quizSlice';
 
-const QuizesList = ({ navigation }) => {
+const QuizzesList = ({ navigation, category, query }) => {
+  const quizzes = useSelector(selectQuizzes)
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    if (category) {
+      dispatch(fetchQuizzesAction({categoryId: category.id}));
+    } else {
+      dispatch(fetchQuizzesAction({query: query}));
+    }
+  }, [dispatch, fetchQuizzesAction, query]);
+
   return (
-    <ScrollView contentContainerStyle={styles.container} style={styles.quizesList} showsVerticalScrollIndicator={false}>
+    <ScrollView contentContainerStyle={styles.container} style={styles.quizzesList} showsVerticalScrollIndicator={false}>
       {
-        quizes.map((quiz, i) => {
+        quizzes.map((quiz, i) => {
           return (
-            <Pressable style={styles.pressable} key={i} onPress={() => navigation.navigate('Home')}>
+            <Pressable style={styles.pressable} key={i} onPress={() => navigation.navigate('Quiz', { quiz: quiz })}>
               <View style={styles.quizContainer}>
-                <Image style={styles.quizImage} source={require('../../assets/artistic-adventures.jpg')} />
+                <Image style={styles.quizImage} source={quiz.image} />
 
                 <View style={styles.quizDetails}>
                   <Text style={styles.name}>{quiz.name}</Text>
-                  <Text style={styles.smallText}>{quiz.questionsCount} Questions</Text>
-                  <Text style={styles.smallText}>Beginner, Grammar, English</Text>
+                  <Text style={styles.smallText}>{quiz.questions_count} Questions</Text>
+                  <Text style={styles.smallText}>{quiz.tags_string}</Text>
                 </View>
               </View>
             </Pressable>
@@ -30,7 +44,7 @@ const styles = StyleSheet.create({
     paddingBottom: 70,
   },
 
-  quizesList: {
+  quizzesList: {
     flex: 2,
     width: '100%',
     marginTop: 2,
@@ -74,4 +88,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default QuizesList;
+export default QuizzesList;
