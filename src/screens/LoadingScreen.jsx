@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, ActivityIndicator, Image } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 
-import getToken from '../config/token';
+import { getToken } from '../config/token';
 
 import { fetchCurrentUserAction } from '../reducers/users/userAction';
 import { selectCurrentUser, selectFetchedCurrentUser } from '../reducers/users/userSlice';

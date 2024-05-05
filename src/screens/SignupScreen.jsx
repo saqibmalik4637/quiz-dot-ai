@@ -10,17 +10,28 @@ import { selectCurrentUser, selectFetchedCurrentUser, selectUserToken } from '..
 import { fetchCarouselsAction } from '../reducers/carousels/carouselAction';
 import { selectCarousels } from '../reducers/carousels/carouselSlice';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 const SignupScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const userToken = useSelector(selectUserToken);
   const currentUser = useSelector(selectCurrentUser);
   const fetchedCurrentUser = useSelector(selectFetchedCurrentUser);
   const carousels = useSelector(selectCarousels);
+  const [tokenStored, setTokenStored] = useState(false);
   const [fullname, setFullname] = useState('');
   const [age, setAge] = useState('');
   const [countryCode, setCountryCode] = useState('');
   const [countryName, setCountryName] = useState('');
   const [showCountryPicker, setShowCountryPicker] = useState(false);
+
+  const _storeToken = async (token) => {
+    try {
+      await AsyncStorage.setItem('token', token);
+    } catch (error) {
+      console.log("Unable to set token", error.message);
+    }
+  };
 
   const redirectToHome = () => {
     navigation.navigate('Home');
@@ -36,9 +47,16 @@ const SignupScreen = ({ navigation }) => {
 
   useEffect(() => {
     if (userToken) {
-      dispatch(fetchCurrentUserAction());
+      _storeToken(userToken);
+      setTokenStored(true);
     }
   }, [userToken]);
+
+  useEffect(() => {
+    if (tokenStored) {
+      dispatch(fetchCurrentUserAction());
+    }
+  }, [tokenStored]);
 
   useEffect(() => {
     if (fetchedCurrentUser && Object.keys(currentUser).length > 0) {
@@ -54,7 +72,7 @@ const SignupScreen = ({ navigation }) => {
         </View>
 
         <View style={styles.screenDescription}>
-          <Text style={styles.screenDescription.text}>Please complete your profile. Don't worry, your data will remain private and only you can see it.</Text>
+          <Text style={styles.screenDescription.text}>Unlock the treasure trove of quizzes tailored just for you! Share a sprinkle of your details, and we'll conjure up the perfect quiz potion for your entertainment delight. Let's get started on this adventure together! 🚀✨</Text>
         </View>
       </View>
 
@@ -150,13 +168,14 @@ const styles = StyleSheet.create({
   },
 
   screenDescription: {
-    padding: 25,
+    paddingTop: 40,
+    padding: 10,
     alignItems: 'center',
 
     text: {
       fontSize: 18,
       lineHeight: 25,
-      letterSpacing: 0.25,
+      letterSpacing: 1,
       textAlign: 'center',
     }
   },

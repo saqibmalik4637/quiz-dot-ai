@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice } from '@reduxjs/toolkit';
 
 export const userSlice = createSlice({
   name: 'user',
@@ -18,7 +18,7 @@ export const userSlice = createSlice({
   },
   reducers: {
     fetchCurrentUser: (state, action) => {
-      state.currentUser = [...action.payload.user]
+      state.currentUser = action.payload.user
       state.fetchCurrentUserError = action.payload.error
       state.fetchingCurrentUser = false
       state.fetchedCurrentUser = true
