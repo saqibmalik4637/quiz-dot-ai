@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { getToken } from './token';
 
-const BASE_URL = 'https://aa2a-2401-4900-1f39-1013-8a25-6d02-ddef-5afe.ngrok-free.app'
+const BASE_URL = 'https://1cb5-2401-4900-1f39-3d46-e336-14fe-50cb-253e.ngrok-free.app'
 const HEADERS = { "Content-Type": "application/json", "accept": "application/json" }
 
 export const axiosInstance = axios.create({
@@ -21,6 +21,6 @@ export const createAxiosInstanceWithToken = async () => {
     return axiosInstanceWithToken;
   } catch (error) {
     console.error("Error creating axios instance with token:", error);
-    throw error; // Throw the error to be handled by the caller
+    throw error;
   }
 };
