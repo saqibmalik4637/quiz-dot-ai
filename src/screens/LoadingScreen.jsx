@@ -28,7 +28,7 @@ const LoadingScreen = ({ navigation }) => {
   }, [getToken]);
 
   useEffect(() => {
-    if (fetchedCurrentUser && Object.keys(currentUser).length > 0) {
+    if (fetchedCurrentUser && (currentUser && Object.keys(currentUser).length > 0)) {
       dispatch(fetchCarouselsAction());
     }
   }, [fetchedCurrentUser, currentUser]);

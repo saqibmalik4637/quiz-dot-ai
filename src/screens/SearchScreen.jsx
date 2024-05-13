@@ -6,6 +6,7 @@ import { selectSuggestions } from '../reducers/search/searchSlice';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons/faChevronLeft';
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons/faArrowRight';
+import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons/faMagnifyingGlass';
 
 const SearchScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -44,7 +45,7 @@ const SearchScreen = ({ navigation }) => {
         </TouchableOpacity>
 
         <View style={styles.searchForm}>
-          <FontAwesomeIcon icon="fa-magnifying-glass" color="#35095c" style={styles.searchIcon} size={20} />
+          <FontAwesomeIcon icon={faMagnifyingGlass} color="#35095c" style={styles.searchIcon} size={20} />
           <TextInput
             style={styles.textInput}
             onChangeText={setQuery}
@@ -64,7 +65,7 @@ const SearchScreen = ({ navigation }) => {
             { suggestions.map((suggestion, index) => {
               return <TouchableOpacity key={index} style={styles.suggestionItem} onPress={() => handleSuggestionClick(suggestion)}>
                 <View style={styles.suggestionTextContainer}>
-                  <FontAwesomeIcon icon="fa-magnifying-glass" color="#a3a098" style={styles.searchSuggestionIcon} size={16} />
+                  <FontAwesomeIcon icon={faMagnifyingGlass} color="#a3a098" style={styles.searchSuggestionIcon} size={16} />
                   <Text style={styles.suggestionText}>{suggestion}</Text>              
                 </View>
 

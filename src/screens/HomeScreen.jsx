@@ -3,10 +3,12 @@ import { StyleSheet, View, Image, ScrollView, Text, TouchableOpacity } from 'rea
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchCarouselsAction } from '../reducers/carousels/carouselAction';
 import { selectCarousels } from '../reducers/carousels/carouselSlice';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import Header from '../components/Header';
 import QuizCarousel from '../components/carousels/Quizzes';
 import CategoryCarousel from '../components/carousels/Categories';
+
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons/faMagnifyingGlass';
 
 const HomeScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -28,7 +30,7 @@ const HomeScreen = ({ navigation }) => {
 
           <View style={styles.iconContainer}>
             <TouchableOpacity onPress={() => navigation.navigate('Search')}>
-              <FontAwesomeIcon icon="fa-magnifying-glass" color="#35095c" style={styles.icon} size={20} />
+              <FontAwesomeIcon icon={faMagnifyingGlass} color="#35095c" style={styles.icon} size={20} />
             </TouchableOpacity>
           </View>
         </View>

@@ -2,10 +2,10 @@ import { StyleSheet, ScrollView, View, Pressable, Text, Image } from 'react-nati
 import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchQuizzesAction } from '../reducers/quizzes/quizAction';
-import { selectQuizzes } from '../reducers/quizzes/quizSlice';
+import { selectQuiz } from '../reducers/quizzes/quizSlice';
 
 const QuizzesList = ({ navigation, category, query }) => {
-  const quizzes = useSelector(selectQuizzes)
+  const { quizzes } = useSelector(selectQuiz);
   const dispatch = useDispatch()
 
   useEffect(() => {

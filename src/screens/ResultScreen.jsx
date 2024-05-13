@@ -1,11 +1,50 @@
-import { StyleSheet, View, Text, ScrollView, Pressable } from 'react-native';
+import { Dimensions, StyleSheet, View, Text, ScrollView, Pressable } from 'react-native';
 
 import { useSelector, useDispatch } from 'react-redux';
 import QuizzesList from '../components/QuizzesList';
 
+import { PieChart } from 'react-native-chart-kit';
+
 const ResultScreen = ({ route, navigation }) => {
-  const result = route.params.result;
-  const allAnswers = result.allAnswers;
+  const screenWidth = Dimensions.get("window").width;
+
+  const reportCard = route.params.reportCard;
+  const allAnswers = reportCard.given_answers;
+
+  const chartConfig = {
+    backgroundGradientFrom: "#1E2923",
+    backgroundGradientFromOpacity: 0,
+    backgroundGradientTo: "#08130D",
+    backgroundGradientToOpacity: 0.5,
+    color: (opacity = 1) => `rgba(26, 255, 146, ${opacity})`,
+    strokeWidth: 2, // optional, default 3
+    barPercentage: 0.5,
+    useShadowColorFromDataset: false // optional
+  };
+
+  const data = [
+    {
+      name: "Correct answers",
+      population: reportCard.correct_count,
+      color: "#128230",
+      legendFontColor: "#128230",
+      legendFontSize: 15
+    },
+    {
+      name: "Incorrect answers",
+      population: reportCard.incorrect_count,
+      color: "#cf3636",
+      legendFontColor: "#cf3636",
+      legendFontSize: 15
+    },
+    {
+      name: "Timed out",
+      population: reportCard.no_result_count,
+      color: "#7F7F7F",
+      legendFontColor: "#7F7F7F",
+      legendFontSize: 15
+    }
+  ];
 
   return (
     <View style={styles.container} showsVerticalScrollIndicator={false}>
@@ -13,26 +52,30 @@ const ResultScreen = ({ route, navigation }) => {
         <Text style={styles.headerText}>FINAL SCOREBOARD</Text>
       </View>
       <ScrollView style={styles.resultContainerParent} showsVerticalScrollIndicator={false}>
-        <View style={styles.resultContainer}>
-          <View style={styles.scoreContainer}>
-            <View style={styles.numbersContainer}>
-              <Text style={styles.correctAnswerNumber}>10</Text>
-              <Text style={styles.correctAnswerText}>CORRECT</Text>
-            </View>
-            <View style={styles.numbersContainer}>
-              <Text style={styles.inCorrectAnswerNumber}>10</Text>
-              <Text style={styles.inCorrectAnswerText}>INCORRECT</Text>
-            </View>
-          </View>
+        <View style={styles.totalScore}>
+          <Text style={styles.totalNumber}>{parseFloat(reportCard.score).toFixed(2)}</Text>
+          {/*<Text style={styles.totalText}>out of {reportCard.quiz_total_points}</Text>*/}
         </View>
 
-        <View style={styles.totalScore}>
-          <Text style={styles.totalNumber}>799.89</Text>
-          <Text style={styles.totalText}>TOTAL POINTS</Text>
+        <View style={styles.resultContainer}>
+          <View>
+            <PieChart
+              data={data}
+              width={screenWidth}
+              height={200}
+              chartConfig={chartConfig}
+              accessor={"population"}
+              backgroundColor={"transparent"}
+              paddingLeft={"0"}
+              center={[0, 0]}
+              absolute
+            />
+          </View>
+          
         </View>
 
         <View style={styles.footerButton}>
-          <Pressable style={[styles.primaryButtonInvert, styles.buttonShadow]}>
+          <Pressable style={[styles.primaryButtonInvert, styles.buttonShadow]} onPress={() => navigation.navigate('Home')}>
             <Text style={styles.primaryButtonInvertText}>GO TO HOME</Text>
           </Pressable>
         </View>
@@ -74,6 +117,7 @@ const styles = StyleSheet.create({
   },
 
   resultContainer: {
+    marginTop: 30,
     width: '100%',
   },
 
@@ -112,13 +156,12 @@ const styles = StyleSheet.create({
   },
 
   totalScore: {
-    marginTop: 80,
     marginHorizontal: 50,
     alignItems: 'center',
   },
 
   totalNumber: {
-    fontSize: 100,
+    fontSize: 80,
     color: '#ded5e6'
   },
 

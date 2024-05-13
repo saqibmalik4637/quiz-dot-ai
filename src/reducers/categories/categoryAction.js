@@ -1,8 +1,8 @@
 import { fetchCategories } from './categorySlice';
-import { getRequest } from '../../config/apiRequest';
+import { getRequestWithToken } from '../../config/apiRequest';
 
 export const fetchCategoriesAction = (query) => async (dispatch) => {
-  const res = await getRequest('/api/v1/categories', { query: query })
+  const res = await getRequestWithToken('/api/v1/categories', { query: query })
   if (res.status === 200) {
     dispatch(fetchCategories({ categories: res.data.categories, error: '' }))
   } else {

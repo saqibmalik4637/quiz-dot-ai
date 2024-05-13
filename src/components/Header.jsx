@@ -1,13 +1,13 @@
 import { StyleSheet, View, Image, Text, TouchableOpacity, TextInput } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons/faChevronLeft';
-import { faArrowRight } from '@fortawesome/free-solid-svg-icons/faArrowRight';
+import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons/faMagnifyingGlass';
 
 const Header = ({ navigation, title }) => {
 
   return (
     <View style={styles.header}>
-      <TouchableOpacity style={styles.arrowIcon} onPress={() => { navigation.goBack(null) }}>
+      <TouchableOpacity style={styles.arrowIcon} onPress={() => { navigation.goBack() }}>
         <FontAwesomeIcon icon={faChevronLeft} color="#a3a098" size={20} />
       </TouchableOpacity>
 
@@ -15,7 +15,7 @@ const Header = ({ navigation, title }) => {
 
       <View style={styles.iconContainer}>
         <TouchableOpacity onPress={() => navigation.navigate('Search')}>
-          <FontAwesomeIcon icon="fa-magnifying-glass" color="#35095c" style={styles.icon} size={20} />
+          <FontAwesomeIcon icon={faMagnifyingGlass} color="#35095c" style={styles.icon} size={20} />
         </TouchableOpacity>
       </View>
     </View>

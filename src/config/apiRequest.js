@@ -13,16 +13,12 @@ export const getRequest = (endpoint, params = {}) => {
 
 export const getRequestWithToken = async (endpoint, params = {}) => {
   try {
-    // Wait for the axios instance with token to be created
     const axiosInstanceWithToken = await createAxiosInstanceWithToken();
 
-    // Make the GET request with token
     const response = await axiosInstanceWithToken.get(`${endpoint}`, { params: params ?? {} });
-    
-    // Return the response data
+
     return response;
   } catch (error) {
-    // Handle any errors
     console.error("Error in getRequestWithToken:", error);
     return { error: 'Unable to fetch data' };
   }
@@ -38,12 +34,15 @@ export const postRequest = (endpoint, body = {}) => {
   })
 }
 
-export const postRequestWithToken = (endpoint, body = {}) => {
-  return axiosInstanceWithToken.post(`${endpoint}`, body)
-  .then((response) => {
-    return response
-  })
-  .catch((error) => {
-    return error.response
-  })
-}
+export const postRequestWithToken = async (endpoint, body = {}) => {
+  try {
+    const axiosInstanceWithToken = await createAxiosInstanceWithToken();
+
+    const response = await axiosInstanceWithToken.post(`${endpoint}`, body);
+
+    return response;
+  } catch (error) {
+    console.error("Error in postRequestWithToken:", error);
+    return { error: 'Unable to post data' };
+  }
+};

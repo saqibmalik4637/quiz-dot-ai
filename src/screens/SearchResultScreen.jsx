@@ -6,7 +6,7 @@ import QuizzesList from '../components/QuizzesList';
 import CategoriesList from '../components/CategoriesList';
 
 import { fetchQuizzesAction } from '../reducers/quizzes/quizAction';
-import { selectQuizzes } from '../reducers/quizzes/quizSlice';
+import { selectQuiz } from '../reducers/quizzes/quizSlice';
 
 import { fetchCategoriesAction } from '../reducers/categories/categoryAction';
 import { selectCategories } from '../reducers/categories/categorySlice';
@@ -14,12 +14,13 @@ import { selectCategories } from '../reducers/categories/categorySlice';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons/faChevronLeft';
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons/faArrowRight';
+import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons/faMagnifyingGlass';
 
 const SearchResultScreen = ({ route, navigation }) => {
   const [query, setQuery] = useState(route.params.query);
   const dispatch = useDispatch();
   const categories = useSelector(selectCategories);
-  const quizzes = useSelector(selectQuizzes);
+  const { quizzes } = useSelector(selectQuiz);
 
   const [resultFor, setResultFor] = useState('Quizzes');
 
@@ -43,7 +44,7 @@ const SearchResultScreen = ({ route, navigation }) => {
         </TouchableOpacity>
 
         <View style={styles.searchForm}>
-          <FontAwesomeIcon icon="fa-magnifying-glass" color="#35095c" style={styles.searchIcon} size={20} />
+          <FontAwesomeIcon icon={faMagnifyingGlass} color="#35095c" style={styles.searchIcon} size={20} />
           <TextInput
             style={styles.textInput}
             onChangeText={setQuery}

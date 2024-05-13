@@ -1,6 +1,5 @@
+import { useState, useEffect } from 'react';
 import { StyleSheet, View, Image, Text, TouchableOpacity, Pressable, ScrollView } from 'react-native';
-
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
 import EmptyStar from '../components/icons/EmptyStar';
 import FilledStar from '../components/icons/FilledStar';
@@ -10,73 +9,123 @@ import { useSelector, useDispatch } from 'react-redux';
 import { setQuestionsInitialStateAction } from '../reducers/questions/questionAction';
 import { fetchingQuestions, fetchedQuestions } from '../reducers/questions/questionSlice';
 
+import {
+  markFavoritedInitialStateAction,
+  unmarkFavoritedInitialStateAction,
+  markFavoritedAction,
+  unmarkFavoritedAction,
+  markPlayedAction
+} from '../reducers/quizzes/quizAction';
+
+import { selectQuiz } from '../reducers/quizzes/quizSlice';
+
 const QuizScreen = ({ route, navigation }) => {
   const dispatch = useDispatch();
-  const quiz = route.params.quiz;
+  const [currentQuiz, setCurrentQuiz] = useState(route.params.quiz);
+
+  const {
+    requestedMarkFavorite,
+    requestedUnmarkFavorite,
+    quiz
+  } = useSelector(selectQuiz);
+
+  useEffect(() => {
+    dispatch(markFavoritedInitialStateAction());
+    dispatch(unmarkFavoritedInitialStateAction());
+  }, []);
+
+  useEffect(() => {
+    if (requestedMarkFavorite && (quiz && Object.keys(quiz).length > 0)) {
+      setCurrentQuiz(quiz);
+      dispatch(markFavoritedInitialStateAction());
+    }
+  }, [requestedMarkFavorite, quiz]);
+
+  useEffect(() => {
+    if (requestedUnmarkFavorite && (quiz && Object.keys(quiz).length > 0)) {
+      setCurrentQuiz(quiz);
+      dispatch(unmarkFavoritedInitialStateAction());
+    }
+  }, [requestedUnmarkFavorite, quiz]);
 
   const goToPlayRoom = () => {
+    dispatch(markPlayedAction({quizId: currentQuiz.id}));
     dispatch(setQuestionsInitialStateAction());
-    navigation.navigate('PlayRoom', { quiz: quiz });
+    navigation.navigate('PlayRoom', { quiz: currentQuiz });
+  }
+
+  const markFavorite = () => {
+    dispatch(markFavoritedAction({quizId: currentQuiz.id}));
+  }
+
+  const unmarkFavorite = () => {
+    dispatch(unmarkFavoritedAction({quizId: currentQuiz.id}));
   }
 
   return (
-    <View style={styles.container}>
-      <View contentContainerStyle={styles.contentContainerFlex} style={styles.contentContainer}>
-        <View style={styles.header}>
-          <TouchableOpacity style={styles.arrowIcon} onPress={() => { navigation.goBack(null) }}>
-            <Text style={styles.backButton}>X</Text>
-          </TouchableOpacity>
+    <>
+      { currentQuiz &&
+        <View style={styles.container}>
+          <View contentContainerStyle={styles.contentContainerFlex} style={styles.contentContainer}>
+            <View style={styles.header}>
+              <TouchableOpacity style={styles.arrowIcon} onPress={() => { navigation.goBack(null) }}>
+                <Text style={styles.backButton}>X</Text>
+              </TouchableOpacity>
 
-          <View style={styles.iconContainer}>
-            <TouchableOpacity onPress={() => navigation.navigate('Search')}>
-              <EmptyStar color={"#35095c"} style={styles.icon} size={20} />
-              {/*<FilledStar color={"#35095c"} style={styles.icon} size={20} />*/}
-            </TouchableOpacity>
+              <View style={styles.iconContainer}>
+                { currentQuiz.is_favorited ? (
+                    <TouchableOpacity onPress={unmarkFavorite}>
+                      <FilledStar color={"#35095c"} style={styles.icon} size={20} />
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity onPress={markFavorite}>
+                      <EmptyStar color={"#35095c"} style={styles.icon} size={20} />
+                    </TouchableOpacity>
+                  )
+                }
+              </View>
+            </View>
+
+            <Image style={styles.bannerImage} source={currentQuiz.image} />
+
+            <View style={styles.details}>
+              <Text style={styles.text}>{currentQuiz.name}</Text>
+            </View>
+
+            <View style={styles.stats}>
+              <View style={styles.statsItem}>
+                <Text style={styles.statsItemNumber}>{currentQuiz.questions_count}</Text>
+                <Text style={styles.statsItemText}>Questions</Text>
+              </View>
+              <View style={styles.statsItem}>
+                <Text style={styles.statsItemNumber}>{currentQuiz.played_count}</Text>
+                <Text style={styles.statsItemText}>Played</Text>
+              </View>
+              <View style={styles.statsItem}>
+                <Text style={styles.statsItemNumber}>{currentQuiz.favorited_count}</Text>
+                <Text style={styles.statsItemText}>Favorited</Text>
+              </View>
+            </View>
+
+            <View style={styles.descriptionArea}>
+              <Text style={styles.descriptionHeading}>Description</Text>
+
+              <Text style={styles.descriptionText}>
+                {currentQuiz.description}
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.footer}>
+            <Pressable
+              style={[styles.primaryButton, styles.buttonShadow]}
+              onPress={() => goToPlayRoom()}>
+              <Text style={styles.primaryButtonText}>LET'S PLAY</Text>
+            </Pressable>
           </View>
         </View>
-
-        <Image style={styles.bannerImage} source={quiz.image} />
-
-        <View style={styles.details}>
-          <Text style={styles.text}>{quiz.name}</Text>
-        </View>
-
-        <View style={styles.stats}>
-          <View style={styles.statsItem}>
-            <Text style={styles.statsItemNumber}>{quiz.questions_count}</Text>
-            <Text style={styles.statsItemText}>Questions</Text>
-          </View>
-          <View style={styles.statsItem}>
-            <Text style={styles.statsItemNumber}>{quiz.played_count}</Text>
-            <Text style={styles.statsItemText}>Played</Text>
-          </View>
-          <View style={styles.statsItem}>
-            <Text style={styles.statsItemNumber}>{quiz.favorited_count}</Text>
-            <Text style={styles.statsItemText}>Favorited</Text>
-          </View>
-          <View style={styles.statsItem}>
-            <Text style={styles.statsItemNumber}>{quiz.shared_count}</Text>
-            <Text style={styles.statsItemText}>Shared</Text>
-          </View>
-        </View>
-
-        <ScrollView style={styles.descriptionArea}>
-          <Text style={styles.descriptionHeading}>Description</Text>
-
-          <Text style={styles.descriptionText}>
-            {quiz.description}
-          </Text>
-        </ScrollView>
-      </View>
-
-      <View style={styles.footer}>
-        <Pressable
-          style={[styles.primaryButton, styles.buttonShadow]}
-          onPress={() => goToPlayRoom()}>
-          <Text style={styles.primaryButtonText}>LET'S PLAY</Text>
-        </Pressable>
-      </View>
-    </View>
+      }
+    </>
   )
 };
 
@@ -154,7 +203,6 @@ const styles = StyleSheet.create({
   },
 
   statsItem: {
-    // borderRightWidth: 0.3,
     alignItems: 'center',
     padding: 5
   },
@@ -175,7 +223,9 @@ const styles = StyleSheet.create({
   descriptionText: {
     paddingVertical: 10,
     fontSize: 18,
-    fontWeight: 100
+    fontWeight: 100,
+    lineHeight: 30,
+    letterSpacing: 1
   },
 
   footer: {

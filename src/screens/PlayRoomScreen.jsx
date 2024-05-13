@@ -9,16 +9,22 @@ import { faEllipsis } from '@fortawesome/free-solid-svg-icons/faEllipsis';
 import { fetchQuestionsAction } from '../reducers/questions/questionAction';
 import { selectQuestions, fetchingQuestions, fetchedQuestions } from '../reducers/questions/questionSlice';
 
+import { createReportCardAction, createReportCardReportCardInitialStateAction } from '../reducers/report_cards/reportCardAction';
+import { selectReportCard } from '../reducers/report_cards/reportCardSlice';
+
+import { getCurrentUser } from '../config/user';
+
 import * as Progress from 'react-native-progress';
 
 const PlayRoomScreen = ({ route, navigation }) => {
   const quiz = route.params.quiz;
-  const totalTime = 20;
-
-  // let timeTakenTracker;
-  // let remainingTimeTracker
+  const totalTime = 20 * 1000;
 
   const dispatch = useDispatch();
+
+  const { reportCard, creatingReportCard, createdReportCard } = useSelector(selectReportCard);
+
+  const currentUser = { id: 1, name: "Test" }
 
   const [questionIndex, setQuestionIndex] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState(null);
@@ -61,14 +67,25 @@ const PlayRoomScreen = ({ route, navigation }) => {
     setTimeOver(false);
   }
 
+  const createReportCard = () => {
+    const payload = {
+      user_id: currentUser.id,
+      quiz_id: quiz.id,
+      given_answers: finalResult.allAnswers
+    }
+
+    dispatch(createReportCardAction(payload));
+  }
+
   useEffect(() => {
+    dispatch(createReportCardReportCardInitialStateAction());
     dispatch(fetchQuestionsAction({quizId: quiz.id}));
   }, []);
 
   useEffect(() => {
     if (fetched && !fetching && questions.length > 0) {
       const question = questions[questionIndex];
-      const answerPoint = parseFloat(100.0 / questions.length)
+      const answerPoint = parseFloat(parseFloat(quiz.total_points) / questions.length)
       setPerAnswerPoint(answerPoint);
       setCurrentQuestion(question);
       setCorrectAnswer(question.answer);
@@ -85,7 +102,7 @@ const PlayRoomScreen = ({ route, navigation }) => {
 
   useEffect(() => {
     if (runTimer && !timeTakenTracker) {
-      setTimeTakenTracker(setTimeout(() => { setTimeTaken(timeTaken + 1) }, 1000));
+      setTimeTakenTracker(setTimeout(() => { setTimeTaken(timeTaken + 10) }, 10));
     }
   }, [runTimer]);
 
@@ -105,7 +122,7 @@ const PlayRoomScreen = ({ route, navigation }) => {
       setTimeTakenTracker(null);
 
       if (timeTaken < totalTime) {
-        setTimeTakenTracker(setTimeout(() => { setTimeTaken(timeTaken + 1) }, 1000));
+        setTimeTakenTracker(setTimeout(() => { setTimeTaken(timeTaken + 10) }, 10));
       } else {
         setStopTimer(true);
         setTimeOver(true);
@@ -136,31 +153,51 @@ const PlayRoomScreen = ({ route, navigation }) => {
       let answerScore;
 
       if (result === 'correct') {
-        answerScore = parseFloat(parseFloat(parseFloat(remainingTime / totalTime) * perAnswerPoint) * 10);
+        answerScore = parseFloat(parseFloat(parseFloat(remainingTime / totalTime) * perAnswerPoint));
       } else {
         answerScore = 0
       }
 
-      setAllAnswers([...allAnswers, { question: currentQuestion, userAnswer: userAnswer, correctAnswer: correctAnswer, result: result, points: answerScore }]);
+      setAllAnswers(
+        [
+          ...allAnswers, 
+          {
+            question: currentQuestion,
+            user_answer: userAnswer,
+            correct_answer: correctAnswer,
+            result: result,
+            points: answerScore,
+            time_taken: timeTaken,
+            allowed_time: totalTime
+          }
+        ]
+      );
+
       setTotalScore(parseFloat(parseFloat(totalScore) + parseFloat(answerScore)).toFixed(2));
     }
   }, [result]);
 
   useEffect(() => {
     if (finalResult && Object.keys(finalResult).length > 0) {
-      return () => { navigation.navigate('Result', { result: finalResult }) }
+      createReportCard();
     }
   }, [finalResult]);
+
+  useEffect(() => {
+    if (!creatingReportCard && createdReportCard && (reportCard && Object.keys(reportCard).length > 0)) {
+      navigation.navigate('Result', { reportCard: reportCard });
+    }
+  }, [reportCard, creatingReportCard, createdReportCard]);
 
   return (
     <View style={styles.container}>
       <>
         <View style={styles.header}>
           <Text style={styles.questionsCount}>{questionIndex + 1}/{quiz.questions_count}</Text>
-          <Text style={styles.quizName}>{totalScore}</Text>
+          <Text style={styles.quizName}>Quiz</Text>
           <View style={styles.iconContainer}>
-            <TouchableOpacity onPress={() => navigation.navigate('Search')}>
-              <FontAwesomeIcon icon={faEllipsis} color="#35095c" style={styles.icon} size={20} />
+            <TouchableOpacity onPress={() => { navigation.goBack(null) }}>
+              <Text style={styles.backButton}>X</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -179,7 +216,6 @@ const PlayRoomScreen = ({ route, navigation }) => {
                                 borderWidth={0} unfilledColor={"#ded5e6"} style={styles.progress} animated={false} animationType="timing" />
                 </View>
 
-                <Text style={styles.progressCount}>{remainingTime}</Text>
               </View>
             }
 
@@ -301,7 +337,7 @@ const styles = StyleSheet.create({
   },
 
   bar: {
-    width: '90%'
+    width: '100%'
   },
 
   progressCount: {
@@ -398,6 +434,10 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     borderRadius: 50,
     shadowColor: 'black',
+  },
+  backButton: {
+    fontSize: 20,
+    fontWeight: 900
   },
 });
 
