@@ -23,6 +23,12 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
+      "config": {
+        "googleMobileAdsAppId": "ca-app-pub-3081698164560598~8355760219"
+      },
+      "permissions": [
+        "com.google.android.gms.permission.AD_ID"
+      ],
       "package": "com.saqibmalik.starquiz",
       "versionCode": 3
     },
