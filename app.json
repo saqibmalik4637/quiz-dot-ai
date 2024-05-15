@@ -38,9 +38,8 @@
       [
         "expo-tracking-transparency",
         {
-          "userTrackingPermission":
-            "Allow this app to collect app-related data that can be used for tracking you or your device and deliver personalized ads to you.",
-        },
+          "userTrackingPermission": "Allow this app to collect app-related data that can be used for tracking you or your device and deliver personalized ads to you.",
+        }
       ],
       [
         "expo-build-properties",
@@ -50,10 +49,10 @@
           },
           "android": {
             "extraProguardRules": "-keep class com.google.android.gms.internal.consent_sdk.** { *; }",
-          },
-        },
-      ],
-    ],
+          }
+        }
+      ]
+    ]
   },
   "react-native-google-mobile-ads": {
     "android_app_id": "ca-app-pub-3081698164560598~8355760219",
