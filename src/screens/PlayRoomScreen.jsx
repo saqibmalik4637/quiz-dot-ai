@@ -16,6 +16,19 @@ import { getCurrentUser } from '../config/user';
 
 import * as Progress from 'react-native-progress';
 
+import * as Device from 'expo-device';
+import { AdEventType, InterstitialAd, TestIds } from 'react-native-google-mobile-ads';
+
+// const iosAdmobInterstitial = "ca-app-pub-12345678910/12345678910";
+// const androidAdmobInterstitial = 
+// const productionID = Device.osName === 'Android' ? androidAdmobInterstitial : iosAdmobInterstitial;
+const adUnitId = "ca-app-pub-3081698164560598/7924515371";
+
+const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
+  keywords: ['food', 'cooking', 'fruit'], // Update based on the most relevant keywords for your app/users, these are just random examples
+  requestNonPersonalizedAdsOnly: true, // Update based on the initial tracking settings from initialization earlier
+});
+
 const PlayRoomScreen = ({ route, navigation }) => {
   const quiz = route.params.quiz;
   const totalTime = 20 * 1000;
@@ -43,6 +56,8 @@ const PlayRoomScreen = ({ route, navigation }) => {
   const [totalScore, setTotalScore] = useState(0);
   const [perAnswerPoint, setPerAnswerPoint] = useState(null);
   const [allAnswers, setAllAnswers] = useState([]);
+
+  const [adLoaded, setAdLoaded] = useState(false);
 
   const fetched = useSelector(fetchedQuestions);
   const fetching = useSelector(fetchingQuestions);
@@ -77,9 +92,35 @@ const PlayRoomScreen = ({ route, navigation }) => {
     dispatch(createReportCardAction(payload));
   }
 
+  // useEffect(() => {
+    
+  // }, []);
+
+
+
   useEffect(() => {
     dispatch(createReportCardReportCardInitialStateAction());
     dispatch(fetchQuestionsAction({quizId: quiz.id}));
+    // Event listener for when the ad is loaded
+    const unsubscribeLoaded = interstitial.addAdEventListener(AdEventType.LOADED, () => {
+      setAdLoaded(true);
+    });
+
+    // Event listener for when the ad is closed
+    const unsubscribeClosed = interstitial.addAdEventListener(AdEventType.CLOSED, () => {
+      setAdLoaded(false);
+
+      navigation.navigate('Result', { reportCard: reportCard });
+    });
+
+    // Start loading the interstitial ad straight away
+    interstitial.load();
+
+    // Unsubscribe from events on unmount
+    return () => {
+      unsubscribeLoaded();
+      unsubscribeClosed();
+    };
   }, []);
 
   useEffect(() => {
@@ -184,10 +225,10 @@ const PlayRoomScreen = ({ route, navigation }) => {
   }, [finalResult]);
 
   useEffect(() => {
-    if (!creatingReportCard && createdReportCard && (reportCard && Object.keys(reportCard).length > 0)) {
-      navigation.navigate('Result', { reportCard: reportCard });
+    if (adLoaded && !creatingReportCard && createdReportCard && (reportCard && Object.keys(reportCard).length > 0)) {
+      interstitial.show();
     }
-  }, [reportCard, creatingReportCard, createdReportCard]);
+  }, [reportCard, creatingReportCard, createdReportCard, adLoaded]);
 
   return (
     <View style={styles.container}>
