@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { getToken } from './token';
 
-const BASE_URL = 'https://558d-122-161-53-102.ngrok-free.app'
+const BASE_URL = 'https://7b7a-2401-4900-1c5a-cc56-5ddf-45b8-46a1-61cd.ngrok-free.app'
+
 const HEADERS = { "Content-Type": "application/json", "accept": "application/json" }
 
 export const axiosInstance = axios.create({

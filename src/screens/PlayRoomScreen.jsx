@@ -16,21 +16,20 @@ import { getCurrentUser } from '../config/user';
 
 import * as Progress from 'react-native-progress';
 
-import * as Device from 'expo-device';
-import { AdEventType, InterstitialAd, TestIds } from 'react-native-google-mobile-ads';
+// import * as Device from 'expo-device';
+// import { AdEventType, InterstitialAd, TestIds } from 'react-native-google-mobile-ads';
 
 // const iosAdmobInterstitial = "ca-app-pub-12345678910/12345678910";
 // const androidAdmobInterstitial = 
 // const productionID = Device.osName === 'Android' ? androidAdmobInterstitial : iosAdmobInterstitial;
-const adUnitId = "ca-app-pub-3081698164560598/7924515371";
+// const adUnitId = "ca-app-pub-3081698164560598/7924515371";
 
-const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
-  keywords: ['food', 'cooking', 'fruit'], // Update based on the most relevant keywords for your app/users, these are just random examples
-  requestNonPersonalizedAdsOnly: true, // Update based on the initial tracking settings from initialization earlier
-});
+// const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
+//   keywords: ['food', 'cooking', 'fruit'], // Update based on the most relevant keywords for your app/users, these are just random examples
+//   requestNonPersonalizedAdsOnly: true, // Update based on the initial tracking settings from initialization earlier
+// });
 
 const PlayRoomScreen = ({ route, navigation }) => {
-  const quiz = route.params.quiz;
   const totalTime = 20 * 1000;
 
   const dispatch = useDispatch();
@@ -39,6 +38,7 @@ const PlayRoomScreen = ({ route, navigation }) => {
 
   const currentUser = { id: 1, name: "Test" }
 
+  const [quiz, setQuiz] = useState(null);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [correctAnswer, setCorrectAnswer] = useState(null);
@@ -92,39 +92,44 @@ const PlayRoomScreen = ({ route, navigation }) => {
     dispatch(createReportCardAction(payload));
   }
 
-  // useEffect(() => {
-    
-  // }, []);
-
-
-
   useEffect(() => {
     dispatch(createReportCardReportCardInitialStateAction());
-    dispatch(fetchQuestionsAction({quizId: quiz.id}));
-    // Event listener for when the ad is loaded
-    const unsubscribeLoaded = interstitial.addAdEventListener(AdEventType.LOADED, () => {
-      setAdLoaded(true);
-    });
-
-    // Event listener for when the ad is closed
-    const unsubscribeClosed = interstitial.addAdEventListener(AdEventType.CLOSED, () => {
-      setAdLoaded(false);
-
-      navigation.navigate('Result', { reportCard: reportCard });
-    });
-
-    // Start loading the interstitial ad straight away
-    interstitial.load();
-
-    // Unsubscribe from events on unmount
-    return () => {
-      unsubscribeLoaded();
-      unsubscribeClosed();
-    };
-  }, []);
+    setQuiz(route.params.quiz);
+  }, [route]);
 
   useEffect(() => {
-    if (fetched && !fetching && questions.length > 0) {
+    if (quiz && Object.keys(quiz).length > 0) {
+      dispatch(fetchQuestionsAction({quizId: quiz.id}));
+    }
+  }, [quiz]);
+
+  // useEffect(() => {
+  //   dispatch(createReportCardReportCardInitialStateAction());
+  //   dispatch(fetchQuestionsAction({quizId: quiz.id}));
+  //   // Event listener for when the ad is loaded
+  //   const unsubscribeLoaded = interstitial.addAdEventListener(AdEventType.LOADED, () => {
+  //     setAdLoaded(true);
+  //   });
+
+  //   // Event listener for when the ad is closed
+  //   const unsubscribeClosed = interstitial.addAdEventListener(AdEventType.CLOSED, () => {
+  //     setAdLoaded(false);
+
+  //     navigation.navigate('Result', { reportCard: reportCard });
+  //   });
+
+  //   // Start loading the interstitial ad straight away
+  //   interstitial.load();
+
+  //   // Unsubscribe from events on unmount
+  //   return () => {
+  //     unsubscribeLoaded();
+  //     unsubscribeClosed();
+  //   };
+  // }, []);
+
+  useEffect(() => {
+    if ((quiz && Object.keys(quiz).length > 0) && fetched && !fetching && questions.length > 0) {
       const question = questions[questionIndex];
       const answerPoint = parseFloat(parseFloat(quiz.total_points) / questions.length)
       setPerAnswerPoint(answerPoint);
@@ -133,7 +138,7 @@ const PlayRoomScreen = ({ route, navigation }) => {
       setUserAnswer(null);
       setResult(null);
     }
-  }, [fetched, fetching, questions, questionIndex]);
+  }, [fetched, fetching, questions, questionIndex, quiz]);
 
   useEffect(() => {
     if (currentQuestion) {
@@ -163,7 +168,7 @@ const PlayRoomScreen = ({ route, navigation }) => {
       setTimeTakenTracker(null);
 
       if (timeTaken < totalTime) {
-        setTimeTakenTracker(setTimeout(() => { setTimeTaken(timeTaken + 10) }, 10));
+        setTimeTakenTracker(setTimeout(() => { setTimeTaken(timeTaken + 100) }, 100));
       } else {
         setStopTimer(true);
         setTimeOver(true);
@@ -225,100 +230,107 @@ const PlayRoomScreen = ({ route, navigation }) => {
   }, [finalResult]);
 
   useEffect(() => {
-    if (adLoaded && !creatingReportCard && createdReportCard && (reportCard && Object.keys(reportCard).length > 0)) {
-      interstitial.show();
+    if (!creatingReportCard && createdReportCard && (reportCard && Object.keys(reportCard).length > 0)) {
+      navigation.navigate('Result', { reportCard: reportCard });
     }
-  }, [reportCard, creatingReportCard, createdReportCard, adLoaded]);
+  }, [reportCard, creatingReportCard, createdReportCard]);
 
   return (
     <View style={styles.container}>
-      <>
-        <View style={styles.header}>
-          <Text style={styles.questionsCount}>{questionIndex + 1}/{quiz.questions_count}</Text>
-          <Text style={styles.quizName}>Quiz</Text>
-          <View style={styles.iconContainer}>
-            <TouchableOpacity onPress={() => { navigation.goBack(null) }}>
-              <Text style={styles.backButton}>X</Text>
-            </TouchableOpacity>
+      { (quiz && Object.keys(quiz).length > 0) &&
+        <>
+          <View style={styles.header}>
+            <Text style={styles.questionsCount}>{questionIndex + 1}/{quiz.questions_count}</Text>
+            <Text style={styles.quizName}>Quiz</Text>
+            <View style={styles.iconContainer}>
+              <TouchableOpacity onPress={() => { navigation.goBack(null) }}>
+                <Text style={styles.backButton}>X</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
 
-        { currentQuestion &&
-          <View style={styles.question}>
-            { timeOver ?
-              <View style={styles.timeOverContainer}>
-                <Text style={styles.timeOverText}>Time over, try fast next time!
-                </Text>
-              </View>
-            :
-              <View style={styles.progressBar}>
-                <View style={styles.bar}>
-                  <Progress.Bar progress={timeProgress} height={14} borderRadius={50} width={null} color="#35095c"
-                                borderWidth={0} unfilledColor={"#ded5e6"} style={styles.progress} animated={false} animationType="timing" />
+          { currentQuestion &&
+            <View style={styles.questionFullScreen}>
+              <View style={styles.question}>
+                { timeOver ?
+                  <View style={styles.timeOverContainer}>
+                    <Text style={styles.timeOverText}>Time over, try fast next time!
+                    </Text>
+                  </View>
+                :
+                  <View style={styles.progressBar}>
+                    <View style={styles.bar}>
+                      <Progress.Bar progress={timeProgress} height={14} borderRadius={50} width={null} color="#35095c"
+                                    borderWidth={0} unfilledColor={"#ded5e6"} style={styles.progress} animated={false} animationType="timing" />
+                    </View>
+                  </View>
+                }
+
+                <View style={styles.questionContainer}>
+                  <Text style={styles.questionContent}>{currentQuestion.content}</Text>
                 </View>
 
+                <View style={styles.optionsContainer}>
+                  <ScrollView showsVerticalScrollIndicator={false}>
+                    { currentQuestion.options.map((option, index) => {
+                      return (
+                        <View key={index}>
+                          { userAnswer !== null ?
+                            <>
+                              { option.id === userAnswer.id ?
+                                <Pressable style={[styles.optionItemContainer, userAnswer.id === correctAnswer.id ? {backgroundColor: '#128230'} : {backgroundColor: '#cf3636'}]} key={index}>
+                                  <Text style={styles.optionText}>{option.content}</Text>
+                                </Pressable>
+                              :
+                                <>
+                                  { option.id === correctAnswer.id ?
+                                    <Pressable style={[styles.optionItemContainer, {backgroundColor: '#128230'}]} key={index}>
+                                      <Text style={styles.optionText}>{option.content}</Text>
+                                    </Pressable>
+                                  :
+                                    <Pressable style={[styles.optionItemContainer, {backgroundColor: '#000000'}]} key={index}>
+                                      <Text style={styles.optionText}>{option.content}</Text>
+                                    </Pressable>
+                                  }
+                                </>
+                              }
+                            </>
+                          :
+                            <>
+                              { timeOver ?
+                                <Pressable style={[styles.optionItemContainer, {backgroundColor: '#000000'}]} key={index}>
+                                  <Text style={styles.optionText}>{option.content}</Text>
+                                </Pressable>
+                              :
+                                <Pressable style={[styles.optionItemContainer, {backgroundColor: '#000000'}]} key={index} onPress={() => setUserAnswer(option)}>
+                                  <Text style={styles.optionText}>{option.content}</Text>
+                                </Pressable>
+                              }
+                            </>
+                          }
+                        </View>
+                      )
+                    }) }
+                  </ScrollView>
+                </View>
               </View>
-            }
 
-            <View style={styles.questionContainer}>
-              <Text style={styles.questionContent}>{currentQuestion.content}</Text>
+              <View style={{justifyContent: 'flex-end'}}>
+              { result ? 
+                <Pressable
+                  style={[styles.primaryButton, styles.buttonShadow]}
+                  onPress={() => nextQuestion()}>
+                  <Text style={styles.primaryButtonText}>{ questionIndex + 1 < questions.length ? 'NEXT' : 'SEE REPORT CARD' }</Text>
+                </Pressable>
+              : <Pressable style={[styles.primaryButtonInvert, styles.buttonShadow]}>
+                  <Text style={styles.primaryButtonInvertText}>{ questionIndex + 1 < questions.length ? 'NEXT' : 'SEE REPORT CARD' }</Text>
+                </Pressable>
+              }
+              </View>
             </View>
-
-            <View style={styles.optionsContainer}>
-              { currentQuestion.options.map((option, index) => {
-                return (
-                  <View key={index}>
-                    { userAnswer !== null ?
-                      <>
-                        { option.id === userAnswer.id ?
-                          <Pressable style={userAnswer.id === correctAnswer.id ? styles.correctAnswer : styles.wrongAnswer} key={index}>
-                            <Text style={styles.optionText}>{option.content}</Text>
-                          </Pressable>
-                        :
-                          <>
-                            { option.id === correctAnswer.id ?
-                              <Pressable style={styles.correctAnswer} key={index}>
-                                <Text style={styles.optionText}>{option.content}</Text>
-                              </Pressable>
-                            :
-                              <Pressable style={styles.optionItemContainer} key={index}>
-                                <Text style={styles.optionText}>{option.content}</Text>
-                              </Pressable>
-                            }
-                          </>
-                        }
-                      </>
-                    :
-                      <>
-                        { timeOver ?
-                          <Pressable style={styles.optionItemContainer} key={index}>
-                            <Text style={styles.optionText}>{option.content}</Text>
-                          </Pressable>
-                        :
-                          <Pressable style={styles.optionItemContainer} key={index} onPress={() => setUserAnswer(option)}>
-                            <Text style={styles.optionText}>{option.content}</Text>
-                          </Pressable>
-                        }
-                      </>
-                    }
-                  </View>
-                )
-              }) }
-            </View>
-
-            { result ? 
-              <Pressable
-                style={[styles.primaryButton, styles.buttonShadow]}
-                onPress={() => nextQuestion()}>
-                <Text style={styles.primaryButtonText}>{ questionIndex + 1 < questions.length ? 'NEXT' : 'SEE REPORT CARD' }</Text>
-              </Pressable>
-            : <Pressable style={[styles.primaryButtonInvert, styles.buttonShadow]}>
-                <Text style={styles.primaryButtonInvertText}>{ questionIndex + 1 < questions.length ? 'NEXT' : 'SEE REPORT CARD' }</Text>
-              </Pressable>
-            }
-          </View>
-        }
-      </>
+          }
+        </>
+      }
     </View>
   )
 }
@@ -385,12 +397,17 @@ const styles = StyleSheet.create({
     fontSize: 20
   },
 
+  questionFullScreen: {
+    height: '85%',
+    justifyContent: 'space-between',    
+  },
+
   question: {
     justifyContent: 'space-between'
   },
 
   questionContainer: {
-    height: '30%',
+    height: '40%',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#ded5e6',
@@ -403,12 +420,12 @@ const styles = StyleSheet.create({
   },
 
   optionsContainer: {
-    height: '40%',
-    justifyContent: 'space-between'
+    // height: 'auto',
+    // justifyContent: 'space-between'
   },
 
   optionItemContainer: {
-    backgroundColor: '#000000',
+    marginTop: 10,
     padding: 20,
     borderRadius: 50,
     alignItems: 'center'
@@ -419,20 +436,6 @@ const styles = StyleSheet.create({
     fontSize: 18
   },
 
-  correctAnswer: {
-    backgroundColor: '#128230',
-    padding: 20,
-    borderRadius: 50,
-    alignItems: 'center'
-  },
-
-  wrongAnswer: {
-    backgroundColor: '#cf3636',
-    padding: 20,
-    borderRadius: 50,
-    alignItems: 'center'
-  },
-
   primaryButton: {
     backgroundColor: '#35095c',
     width: '100%',
@@ -440,7 +443,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 20,
     borderRadius: 50,
-    marginBottom: 20,
+    shadowColor: 'black',
+  },
+
+  primaryButtonInvert: {
+    backgroundColor: '#ded5e6',
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 20,
+    borderRadius: 50,
     shadowColor: 'black',
   },
 
@@ -467,18 +479,9 @@ const styles = StyleSheet.create({
     color: '#35095c',
   },
 
-  primaryButtonInvert: {
-    backgroundColor: '#ded5e6',
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 20,
-    borderRadius: 50,
-    shadowColor: 'black',
-  },
   backButton: {
     fontSize: 20,
-    fontWeight: 900
+    // fontWeight: '900'
   },
 });
 

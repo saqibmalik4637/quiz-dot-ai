@@ -64,6 +64,13 @@ const SignupScreen = ({ navigation }) => {
     }
   }, [fetchedCurrentUser, currentUser]);
 
+  useEffect(() => {
+    console.log(carousels)
+    if (carousels && (carousels.length > 0)) {
+      navigation.navigate('Home');
+    }
+  }, [carousels]);
+
   return (
     <View  style={styles.container}>
       <View style={styles.screenIntro}>
@@ -123,13 +130,13 @@ const SignupScreen = ({ navigation }) => {
               popularCountries={['en', 'in', 'us']}
             />
           </View>
-        </View>
 
-        <Pressable
-          style={[styles.primaryButton, styles.buttonShadow]}
-          onPress={handleSubmit}>
-          <Text style={styles.primaryButtonText}>Let's play</Text>
-        </Pressable>
+          <Pressable
+            style={[styles.primaryButton, styles.buttonShadow]}
+            onPress={handleSubmit}>
+            <Text style={styles.primaryButtonText}>Let's play</Text>
+          </Pressable>
+        </View>
       </ScrollView>
     </View>
   );

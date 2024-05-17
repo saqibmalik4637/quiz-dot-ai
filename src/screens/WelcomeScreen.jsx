@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Pressable, Text, Alert } from 'react-native';
-import Swiper from 'react-native-swiper';
+// import Swiper from 'react-native-swiper';
 import WelcomeSlide from '../components/WelcomeSlide';
 
 const WelcomeScreen = ({ navigation }) => {
@@ -21,15 +21,19 @@ const WelcomeScreen = ({ navigation }) => {
     }
   ]
 
+  useEffect(() => {
+    console.log("Welcome screen");
+  }, []);
+
   return (
     <View style={styles.container}>
-      <Swiper style={styles.swiper}>
+      {/*<Swiper style={styles.swiper}>
         { 
           slideContents.map((slideData, i) => {
             return <WelcomeSlide key={i} text={slideData.text} image={slideData.image} />
           })
         }
-      </Swiper>
+      </Swiper>*/}
 
       <View style={styles.buttonsView}>
         <Pressable

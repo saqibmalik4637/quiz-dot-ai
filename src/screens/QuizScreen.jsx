@@ -21,7 +21,7 @@ import { selectQuiz } from '../reducers/quizzes/quizSlice';
 
 const QuizScreen = ({ route, navigation }) => {
   const dispatch = useDispatch();
-  const [currentQuiz, setCurrentQuiz] = useState(route.params.quiz);
+  const [currentQuiz, setCurrentQuiz] = useState(null);
 
   const {
     requestedMarkFavorite,
@@ -30,9 +30,11 @@ const QuizScreen = ({ route, navigation }) => {
   } = useSelector(selectQuiz);
 
   useEffect(() => {
+    console.log("route.params.quiz", route.params.quiz)
+    setCurrentQuiz(route.params.quiz);
     dispatch(markFavoritedInitialStateAction());
     dispatch(unmarkFavoritedInitialStateAction());
-  }, []);
+  }, [route]);
 
   useEffect(() => {
     if (requestedMarkFavorite && (quiz && Object.keys(quiz).length > 0)) {
@@ -153,7 +155,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     fontSize: 20,
-    fontWeight: 900
+    // fontWeight: '900'
   },
   arrowIcon: {
     marginTop: 10,
@@ -188,7 +190,7 @@ const styles = StyleSheet.create({
 
   text: {
     fontSize: 20,
-    fontWeight: '600',
+    // fontWeight: '600',
   },
 
   stats: {
@@ -208,7 +210,7 @@ const styles = StyleSheet.create({
   },
 
   statsItemNumber: {
-    fontWeight: 900,
+    // fontWeight: '900',
     fontSize: 25
   },
 
@@ -223,7 +225,7 @@ const styles = StyleSheet.create({
   descriptionText: {
     paddingVertical: 10,
     fontSize: 18,
-    fontWeight: 100,
+    // fontWeight: '100',
     lineHeight: 30,
     letterSpacing: 1
   },

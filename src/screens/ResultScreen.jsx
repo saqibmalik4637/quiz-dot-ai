@@ -1,15 +1,53 @@
+import { useEffect, useState } from 'react';
 import { Dimensions, StyleSheet, View, Text, ScrollView, Pressable } from 'react-native';
 
 import { useSelector, useDispatch } from 'react-redux';
 import QuizzesList from '../components/QuizzesList';
 
+import { createReportCardReportCardInitialStateAction } from '../reducers/report_cards/reportCardAction';
+
 import { PieChart } from 'react-native-chart-kit';
 
 const ResultScreen = ({ route, navigation }) => {
+  const dispatch = useDispatch();
   const screenWidth = Dimensions.get("window").width;
 
-  const reportCard = route.params.reportCard;
-  const allAnswers = reportCard.given_answers;
+  const [reportCard, SetReportCard] = useState(null);
+  const [grapghData, setGraphData] = useState([]);
+
+  useEffect(() => {
+    dispatch(createReportCardReportCardInitialStateAction());
+    SetReportCard(route.params.reportCard);
+  }, [route]);
+
+  useEffect(() => {
+    if (reportCard && Object.keys(reportCard).length > 0) {
+      console.log(reportCard);
+      setGraphData([
+        {
+          name: "Correct answers",
+          population: reportCard.correct_count,
+          color: "#128230",
+          legendFontColor: "#128230",
+          legendFontSize: 15
+        },
+        {
+          name: "Incorrect answers",
+          population: reportCard.incorrect_count,
+          color: "#cf3636",
+          legendFontColor: "#cf3636",
+          legendFontSize: 15
+        },
+        {
+          name: "Timed out",
+          population: reportCard.no_result_count,
+          color: "#7F7F7F",
+          legendFontColor: "#7F7F7F",
+          legendFontSize: 15
+        }
+      ]);
+    }
+  }, [reportCard]);
 
   const chartConfig = {
     backgroundGradientFrom: "#1E2923",
@@ -22,70 +60,50 @@ const ResultScreen = ({ route, navigation }) => {
     useShadowColorFromDataset: false // optional
   };
 
-  const data = [
-    {
-      name: "Correct answers",
-      population: reportCard.correct_count,
-      color: "#128230",
-      legendFontColor: "#128230",
-      legendFontSize: 15
-    },
-    {
-      name: "Incorrect answers",
-      population: reportCard.incorrect_count,
-      color: "#cf3636",
-      legendFontColor: "#cf3636",
-      legendFontSize: 15
-    },
-    {
-      name: "Timed out",
-      population: reportCard.no_result_count,
-      color: "#7F7F7F",
-      legendFontColor: "#7F7F7F",
-      legendFontSize: 15
-    }
-  ];
-
   return (
     <View style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
         <Text style={styles.headerText}>FINAL SCOREBOARD</Text>
       </View>
-      <ScrollView style={styles.resultContainerParent} showsVerticalScrollIndicator={false}>
-        <View style={styles.totalScore}>
-          <Text style={styles.totalNumber}>{parseFloat(reportCard.score).toFixed(2)}</Text>
-          {/*<Text style={styles.totalText}>out of {reportCard.quiz_total_points}</Text>*/}
-        </View>
 
-        <View style={styles.resultContainer}>
-          <View>
-            <PieChart
-              data={data}
-              width={screenWidth}
-              height={200}
-              chartConfig={chartConfig}
-              accessor={"population"}
-              backgroundColor={"transparent"}
-              paddingLeft={"0"}
-              center={[0, 0]}
-              absolute
-            />
+      { (reportCard && Object.keys(reportCard).length > 0) &&
+        <ScrollView style={styles.resultContainerParent} showsVerticalScrollIndicator={false}>
+          <View style={styles.totalScore}>
+            <Text style={styles.totalNumber}>{parseFloat(reportCard.score).toFixed(2)}</Text>
+            {/*<Text style={styles.totalText}>out of {reportCard.quiz_total_points}</Text>*/}
           </View>
-          
-        </View>
 
-        <View style={styles.footerButton}>
-          <Pressable style={[styles.primaryButtonInvert, styles.buttonShadow]} onPress={() => navigation.navigate('Home')}>
-            <Text style={styles.primaryButtonInvertText}>GO TO HOME</Text>
-          </Pressable>
-        </View>
+          { (grapghData && grapghData.length > 0) &&
+            <View style={styles.resultContainer}>
+              <View>
+                <PieChart
+                  data={grapghData}
+                  width={screenWidth}
+                  height={200}
+                  chartConfig={chartConfig}
+                  accessor={"population"}
+                  backgroundColor={"transparent"}
+                  paddingLeft={"0"}
+                  center={[0, 0]}
+                  absolute
+                />
+              </View>
+            </View>
+          }
 
-        <View style={styles.moreItems}>
-          <Text style={styles.moreItemHeading}>SIMILAR QUIZZES:</Text>
+          <View style={styles.footerButton}>
+            <Pressable style={[styles.primaryButtonInvert, styles.buttonShadow]} onPress={() => navigation.navigate('Home')}>
+              <Text style={styles.primaryButtonInvertText}>GO TO HOME</Text>
+            </Pressable>
+          </View>
 
-          <QuizzesList navigation={navigation} query={"math"} />
-        </View>
-      </ScrollView>
+          <View style={styles.moreItems}>
+            <Text style={styles.moreItemHeading}>SIMILAR QUIZZES:</Text>
+
+            <QuizzesList navigation={navigation} query={reportCard.quiz_category_name} />
+          </View>
+        </ScrollView>
+      }
     </View>
   )
 };

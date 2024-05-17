@@ -38,8 +38,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   topic: {
-    fontSize: 18,
-    fontWeight: 900,
+    fontSize: 14,
+    // fontWeight: '400',
   },
   link: {
     flexDirection: 'row',
@@ -57,11 +57,12 @@ const styles = StyleSheet.create({
     marginRight: 10,
     marginBottom: 10,
     shadowColor: '#35095c',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
+    shadowOffset: { width: '0', height: '4' },
+    shadowOpacity: '0.3',
+    shadowRadius: '2',
     backgroundColor: '#fff',
     borderRadius: 20,
+    elevation: 3,
   }
 });
 
