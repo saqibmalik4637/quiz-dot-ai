@@ -14,6 +14,7 @@ import QuizScreen from './screens/QuizScreen';
 import SearchResultScreen from './screens/SearchResultScreen';
 import PlayRoomScreen from './screens/PlayRoomScreen';
 import ResultScreen from './screens/ResultScreen';
+import PrivacyPolicyScreen from './screens/PrivacyPolicyScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -32,6 +33,7 @@ const Navigation = () => {
         <Stack.Screen name="Quiz" component={QuizScreen} options={{ headerShown: false }} />
         <Stack.Screen name="PlayRoom" component={PlayRoomScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Result" component={ResultScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} options={{ title: 'Privacy Policy' }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

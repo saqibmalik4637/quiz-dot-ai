@@ -30,7 +30,6 @@ const QuizScreen = ({ route, navigation }) => {
   } = useSelector(selectQuiz);
 
   useEffect(() => {
-    console.log("route.params.quiz", route.params.quiz)
     setCurrentQuiz(route.params.quiz);
     dispatch(markFavoritedInitialStateAction());
     dispatch(unmarkFavoritedInitialStateAction());

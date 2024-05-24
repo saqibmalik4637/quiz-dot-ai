@@ -65,7 +65,6 @@ const SignupScreen = ({ navigation }) => {
   }, [fetchedCurrentUser, currentUser]);
 
   useEffect(() => {
-    console.log(carousels)
     if (carousels && (carousels.length > 0)) {
       navigation.navigate('Home');
     }
@@ -83,7 +82,7 @@ const SignupScreen = ({ navigation }) => {
         </View>
       </View>
 
-      <ScrollView automaticallyAdjustKeyboardInsets={true} contentContainerStyle={{flex: 1}} style={styles.screenForm}>
+      <ScrollView contentContainerStyle={{flex: 1}} style={styles.screenForm}>
         <View style={styles.formFields}>
           <View style={styles.inputGroup}>
             <Text style={styles.screenForm.text}>Name</Text>

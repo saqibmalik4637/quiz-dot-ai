@@ -6,59 +6,41 @@ import QuizzesList from '../components/QuizzesList';
 
 import { createReportCardReportCardInitialStateAction } from '../reducers/report_cards/reportCardAction';
 
-import { PieChart } from 'react-native-chart-kit';
+import { useInterstitialAd, TestIds } from 'react-native-google-mobile-ads';
 
 const ResultScreen = ({ route, navigation }) => {
+  const { isLoaded, isClosed, load, show } = useInterstitialAd("ca-app-pub-3081698164560598/7924515371");
+
   const dispatch = useDispatch();
   const screenWidth = Dimensions.get("window").width;
 
   const [reportCard, SetReportCard] = useState(null);
   const [grapghData, setGraphData] = useState([]);
+  const [adWatched, setAdWatched] = useState(false);
 
   useEffect(() => {
     dispatch(createReportCardReportCardInitialStateAction());
-    SetReportCard(route.params.reportCard);
-  }, [route]);
+    setAdWatched(false);
+    load();
+  }, [route, load]);
 
   useEffect(() => {
-    if (reportCard && Object.keys(reportCard).length > 0) {
-      console.log(reportCard);
-      setGraphData([
-        {
-          name: "Correct answers",
-          population: reportCard.correct_count,
-          color: "#128230",
-          legendFontColor: "#128230",
-          legendFontSize: 15
-        },
-        {
-          name: "Incorrect answers",
-          population: reportCard.incorrect_count,
-          color: "#cf3636",
-          legendFontColor: "#cf3636",
-          legendFontSize: 15
-        },
-        {
-          name: "Timed out",
-          population: reportCard.no_result_count,
-          color: "#7F7F7F",
-          legendFontColor: "#7F7F7F",
-          legendFontSize: 15
-        }
-      ]);
+    if (isLoaded && !adWatched) {
+      show();
     }
-  }, [reportCard]);
+  }, [isLoaded, show]);
 
-  const chartConfig = {
-    backgroundGradientFrom: "#1E2923",
-    backgroundGradientFromOpacity: 0,
-    backgroundGradientTo: "#08130D",
-    backgroundGradientToOpacity: 0.5,
-    color: (opacity = 1) => `rgba(26, 255, 146, ${opacity})`,
-    strokeWidth: 2, // optional, default 3
-    barPercentage: 0.5,
-    useShadowColorFromDataset: false // optional
-  };
+  useEffect(() => {
+    if (isClosed) {
+      setAdWatched(true);
+    }
+  }, [isClosed]);
+
+  useEffect(() => {
+    if (adWatched) {
+      SetReportCard(route.params.reportCard);
+    }
+  }, [adWatched]);
 
   return (
     <View style={styles.container} showsVerticalScrollIndicator={false}>
@@ -73,23 +55,22 @@ const ResultScreen = ({ route, navigation }) => {
             {/*<Text style={styles.totalText}>out of {reportCard.quiz_total_points}</Text>*/}
           </View>
 
-          { (grapghData && grapghData.length > 0) &&
-            <View style={styles.resultContainer}>
-              <View>
-                <PieChart
-                  data={grapghData}
-                  width={screenWidth}
-                  height={200}
-                  chartConfig={chartConfig}
-                  accessor={"population"}
-                  backgroundColor={"transparent"}
-                  paddingLeft={"0"}
-                  center={[0, 0]}
-                  absolute
-                />
-              </View>
+          <View style={styles.scoreContainer}>
+            <View style={styles.numbersContainer}>
+              <Text style={styles.correctAnswerNumber}>{reportCard.correct_count}</Text>
+              <Text style={styles.correctAnswerText}>correct</Text>
             </View>
-          }
+
+            <View style={styles.numbersContainer}>
+              <Text style={styles.timedOutNumber}>{reportCard.no_result_count}</Text>
+              <Text style={styles.timedOutText}>timed out</Text>
+            </View>
+
+            <View style={styles.numbersContainer}>
+              <Text style={styles.inCorrectAnswerNumber}>{reportCard.incorrect_count}</Text>
+              <Text style={styles.inCorrectAnswerText}>incorrect</Text>
+            </View>
+          </View>
 
           <View style={styles.footerButton}>
             <Pressable style={[styles.primaryButtonInvert, styles.buttonShadow]} onPress={() => navigation.navigate('Home')}>
@@ -140,6 +121,7 @@ const styles = StyleSheet.create({
   },
 
   scoreContainer: {
+    marginTop: 50,
     marginHorizontal: 50,
     flexDirection: 'row',
     justifyContent: 'space-between'
@@ -150,7 +132,7 @@ const styles = StyleSheet.create({
   },
 
   correctAnswerNumber: {
-    fontSize: 100,
+    fontSize: 60,
     color: '#128230',
   },
 
@@ -162,13 +144,25 @@ const styles = StyleSheet.create({
   },
 
   inCorrectAnswerNumber: {
-    fontSize: 100,
+    fontSize: 60,
     color: '#cf3636',
   },
 
   inCorrectAnswerText: {
     fontSize: 20,
     color: '#cf3636',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+
+  timedOutNumber: {
+    fontSize: 60,
+    color: '#b6c7e3',
+  },
+
+  timedOutText: {
+    fontSize: 20,
+    color: '#b6c7e3',
     justifyContent: 'center',
     alignItems: 'center'
   },

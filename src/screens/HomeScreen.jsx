@@ -7,8 +7,8 @@ import Header from '../components/Header';
 import QuizCarousel from '../components/carousels/Quizzes';
 import CategoryCarousel from '../components/carousels/Categories';
 
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons/faMagnifyingGlass';
+import EvilIcons from '@expo/vector-icons/EvilIcons';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 const HomeScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -30,7 +30,11 @@ const HomeScreen = ({ navigation }) => {
 
           <View style={styles.iconContainer}>
             <TouchableOpacity onPress={() => navigation.navigate('Search')}>
-              <FontAwesomeIcon icon={faMagnifyingGlass} color="#35095c" style={styles.icon} size={20} />
+              <EvilIcons name="search" color="#35095c" style={styles.icon} size={24} />
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => navigation.navigate('PrivacyPolicy')}>
+              <MaterialIcons name="privacy-tip" size={20} color="#35095c" />
             </TouchableOpacity>
           </View>
         </View>
@@ -87,6 +91,8 @@ const styles = StyleSheet.create({
   },
   iconContainer: {
     justifyContent: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
     width: 50,
   },
   icon: {

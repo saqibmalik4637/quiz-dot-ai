@@ -3,8 +3,7 @@ import { StyleSheet, View, Image, Text, TouchableOpacity, Pressable, ScrollView 
 import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faEllipsis } from '@fortawesome/free-solid-svg-icons/faEllipsis';
+import { selectCurrentUser } from '../reducers/users/userSlice';
 
 import { fetchQuestionsAction } from '../reducers/questions/questionAction';
 import { selectQuestions, fetchingQuestions, fetchedQuestions } from '../reducers/questions/questionSlice';
@@ -12,31 +11,15 @@ import { selectQuestions, fetchingQuestions, fetchedQuestions } from '../reducer
 import { createReportCardAction, createReportCardReportCardInitialStateAction } from '../reducers/report_cards/reportCardAction';
 import { selectReportCard } from '../reducers/report_cards/reportCardSlice';
 
-import { getCurrentUser } from '../config/user';
-
 import * as Progress from 'react-native-progress';
-
-// import * as Device from 'expo-device';
-// import { AdEventType, InterstitialAd, TestIds } from 'react-native-google-mobile-ads';
-
-// const iosAdmobInterstitial = "ca-app-pub-12345678910/12345678910";
-// const androidAdmobInterstitial = 
-// const productionID = Device.osName === 'Android' ? androidAdmobInterstitial : iosAdmobInterstitial;
-// const adUnitId = "ca-app-pub-3081698164560598/7924515371";
-
-// const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
-//   keywords: ['food', 'cooking', 'fruit'], // Update based on the most relevant keywords for your app/users, these are just random examples
-//   requestNonPersonalizedAdsOnly: true, // Update based on the initial tracking settings from initialization earlier
-// });
 
 const PlayRoomScreen = ({ route, navigation }) => {
   const totalTime = 20 * 1000;
 
   const dispatch = useDispatch();
+  const currentUser = useSelector(selectCurrentUser);
 
   const { reportCard, creatingReportCard, createdReportCard } = useSelector(selectReportCard);
-
-  const currentUser = { id: 1, name: "Test" }
 
   const [quiz, setQuiz] = useState(null);
   const [questionIndex, setQuestionIndex] = useState(0);
@@ -56,8 +39,6 @@ const PlayRoomScreen = ({ route, navigation }) => {
   const [totalScore, setTotalScore] = useState(0);
   const [perAnswerPoint, setPerAnswerPoint] = useState(null);
   const [allAnswers, setAllAnswers] = useState([]);
-
-  const [adLoaded, setAdLoaded] = useState(false);
 
   const fetched = useSelector(fetchedQuestions);
   const fetching = useSelector(fetchingQuestions);
@@ -102,31 +83,6 @@ const PlayRoomScreen = ({ route, navigation }) => {
       dispatch(fetchQuestionsAction({quizId: quiz.id}));
     }
   }, [quiz]);
-
-  // useEffect(() => {
-  //   dispatch(createReportCardReportCardInitialStateAction());
-  //   dispatch(fetchQuestionsAction({quizId: quiz.id}));
-  //   // Event listener for when the ad is loaded
-  //   const unsubscribeLoaded = interstitial.addAdEventListener(AdEventType.LOADED, () => {
-  //     setAdLoaded(true);
-  //   });
-
-  //   // Event listener for when the ad is closed
-  //   const unsubscribeClosed = interstitial.addAdEventListener(AdEventType.CLOSED, () => {
-  //     setAdLoaded(false);
-
-  //     navigation.navigate('Result', { reportCard: reportCard });
-  //   });
-
-  //   // Start loading the interstitial ad straight away
-  //   interstitial.load();
-
-  //   // Unsubscribe from events on unmount
-  //   return () => {
-  //     unsubscribeLoaded();
-  //     unsubscribeClosed();
-  //   };
-  // }, []);
 
   useEffect(() => {
     if ((quiz && Object.keys(quiz).length > 0) && fetched && !fetching && questions.length > 0) {
@@ -237,7 +193,7 @@ const PlayRoomScreen = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
-      { (quiz && Object.keys(quiz).length > 0) &&
+      { (currentUser && quiz && Object.keys(quiz).length > 0) &&
         <>
           <View style={styles.header}>
             <Text style={styles.questionsCount}>{questionIndex + 1}/{quiz.questions_count}</Text>
@@ -252,19 +208,12 @@ const PlayRoomScreen = ({ route, navigation }) => {
           { currentQuestion &&
             <View style={styles.questionFullScreen}>
               <View style={styles.question}>
-                { timeOver ?
-                  <View style={styles.timeOverContainer}>
-                    <Text style={styles.timeOverText}>Time over, try fast next time!
-                    </Text>
+                <View style={styles.progressBar}>
+                  <View style={styles.bar}>
+                    <Progress.Bar progress={timeProgress} height={14} borderRadius={50} width={null} color={ timeOver ? '#cf3636' : '#35095c' }
+                                  borderWidth={0} unfilledColor={"#ded5e6"} style={styles.progress} animated={false} animationType="timing" />
                   </View>
-                :
-                  <View style={styles.progressBar}>
-                    <View style={styles.bar}>
-                      <Progress.Bar progress={timeProgress} height={14} borderRadius={50} width={null} color="#35095c"
-                                    borderWidth={0} unfilledColor={"#ded5e6"} style={styles.progress} animated={false} animationType="timing" />
-                    </View>
-                  </View>
-                }
+                </View>
 
                 <View style={styles.questionContainer}>
                   <Text style={styles.questionContent}>{currentQuestion.content}</Text>
@@ -298,7 +247,7 @@ const PlayRoomScreen = ({ route, navigation }) => {
                           :
                             <>
                               { timeOver ?
-                                <Pressable style={[styles.optionItemContainer, {backgroundColor: '#000000'}]} key={index}>
+                                <Pressable style={[styles.optionItemContainer, option.id === correctAnswer.id ? { backgroundColor: '#128230'} : { backgroundColor: '#000000'} ]} key={index}>
                                   <Text style={styles.optionText}>{option.content}</Text>
                                 </Pressable>
                               :
@@ -481,7 +430,6 @@ const styles = StyleSheet.create({
 
   backButton: {
     fontSize: 20,
-    // fontWeight: '900'
   },
 });
 

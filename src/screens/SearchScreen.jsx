@@ -3,10 +3,9 @@ import { StyleSheet, View, Text, Image, TextInput, TouchableOpacity, ScrollView 
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchSuggestionsAction, clearSuggestionsAction } from '../reducers/search/searchAction';
 import { selectSuggestions } from '../reducers/search/searchSlice';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faChevronLeft } from '@fortawesome/free-solid-svg-icons/faChevronLeft';
-import { faArrowRight } from '@fortawesome/free-solid-svg-icons/faArrowRight';
-import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons/faMagnifyingGlass';
+
+import AntDesign from '@expo/vector-icons/AntDesign';
+import EvilIcons from '@expo/vector-icons/EvilIcons';
 
 const SearchScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -41,11 +40,11 @@ const SearchScreen = ({ navigation }) => {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.arrowIcon} onPress={() => { navigation.goBack(null) }}>
-          <FontAwesomeIcon icon={faChevronLeft} color="#a3a098" size={20} />
+          <AntDesign name="left" color="#a3a098" size={20} />
         </TouchableOpacity>
 
         <View style={styles.searchForm}>
-          <FontAwesomeIcon icon={faMagnifyingGlass} color="#35095c" style={styles.searchIcon} size={20} />
+          <EvilIcons name="search" color="#35095c" style={styles.searchIcon} size={20} />
           <TextInput
             style={styles.textInput}
             onChangeText={setQuery}
@@ -54,7 +53,7 @@ const SearchScreen = ({ navigation }) => {
             value={query}
           />
           <TouchableOpacity style={styles.submitIcon} onPress={() => handleQuerySubmit()}>
-            <FontAwesomeIcon icon={faArrowRight} color="#35095c" size={20} />
+            <AntDesign name="arrowright" color="#35095c" size={20} />
           </TouchableOpacity>
         </View>
       </View>
@@ -65,11 +64,11 @@ const SearchScreen = ({ navigation }) => {
             { suggestions.map((suggestion, index) => {
               return <TouchableOpacity key={index} style={styles.suggestionItem} onPress={() => handleSuggestionClick(suggestion)}>
                 <View style={styles.suggestionTextContainer}>
-                  <FontAwesomeIcon icon={faMagnifyingGlass} color="#a3a098" style={styles.searchSuggestionIcon} size={16} />
+                  <EvilIcons name="search" color="#35095c" style={styles.searchSuggestionIcon} size={16} />
                   <Text style={styles.suggestionText}>{suggestion}</Text>              
                 </View>
 
-                <FontAwesomeIcon icon={faArrowRight} color="#a3a098" style={styles.searchIcon} size={16} />
+                <AntDesign name="arrowright" color="#35095c" style={styles.searchIcon} size={16} />
               </TouchableOpacity>
             })}
           </>

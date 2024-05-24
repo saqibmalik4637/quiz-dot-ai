@@ -3,8 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { StyleSheet, View, TouchableOpacity, Text, ScrollView } from 'react-native';
 import QuizBoxItem from '../QuizBoxItem';
 
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faArrowRight } from '@fortawesome/free-solid-svg-icons/faArrowRight';
+import AntDesign from '@expo/vector-icons/AntDesign';
 
 const Quizzes = ({ navigation, carousel }) => {
   return (
@@ -13,7 +12,7 @@ const Quizzes = ({ navigation, carousel }) => {
         <Text style={styles.topic}>{carousel.title}</Text>
         <TouchableOpacity style={styles.link} onPress={() => navigation.navigate('Quizzes', { query: carousel.title, title: carousel.title })}>
           <Text style={styles.linkText}>View all</Text>
-          <FontAwesomeIcon icon={faArrowRight} color="#35095c" size={14} style={styles.linkIcon} />
+          <AntDesign name="arrowright" size={14} style={styles.linkIcon} />
         </TouchableOpacity>
       </View>
 
@@ -43,6 +42,7 @@ const styles = StyleSheet.create({
   },
   link: {
     flexDirection: 'row',
+    alignItems: 'center'
   },
   linkText: {
     fontSize: 14,

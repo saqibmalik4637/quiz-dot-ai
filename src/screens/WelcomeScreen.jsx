@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Pressable, Text, Alert } from 'react-native';
-// import Swiper from 'react-native-swiper';
+import PagerView from 'react-native-pager-view';
+
 import WelcomeSlide from '../components/WelcomeSlide';
 
 const WelcomeScreen = ({ navigation }) => {
@@ -21,19 +22,17 @@ const WelcomeScreen = ({ navigation }) => {
     }
   ]
 
-  useEffect(() => {
-    console.log("Welcome screen");
-  }, []);
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   return (
     <View style={styles.container}>
-      {/*<Swiper style={styles.swiper}>
+      <PagerView style={styles.swiper} initialPage={0}>
         { 
           slideContents.map((slideData, i) => {
-            return <WelcomeSlide key={i} text={slideData.text} image={slideData.image} />
+            return <WelcomeSlide key={i} text={slideData.text} image={slideData.image} currentIndex={i} />
           })
         }
-      </Swiper>*/}
+      </PagerView>
 
       <View style={styles.buttonsView}>
         <Pressable
@@ -56,12 +55,10 @@ const styles = StyleSheet.create({
     paddingVertical: 50,
     flex: 1,
     backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'space-between',
   },
 
   swiper: {
-    marginTop: 50,
+    flex: 1,
   },
 
   buttonsView: {

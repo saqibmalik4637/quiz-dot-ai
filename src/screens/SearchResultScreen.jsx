@@ -11,10 +11,8 @@ import { selectQuiz } from '../reducers/quizzes/quizSlice';
 import { fetchCategoriesAction } from '../reducers/categories/categoryAction';
 import { selectCategories } from '../reducers/categories/categorySlice';
 
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faChevronLeft } from '@fortawesome/free-solid-svg-icons/faChevronLeft';
-import { faArrowRight } from '@fortawesome/free-solid-svg-icons/faArrowRight';
-import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons/faMagnifyingGlass';
+import AntDesign from '@expo/vector-icons/AntDesign';
+import EvilIcons from '@expo/vector-icons/EvilIcons';
 
 const SearchResultScreen = ({ route, navigation }) => {
   const [query, setQuery] = useState(route.params.query);
@@ -40,11 +38,11 @@ const SearchResultScreen = ({ route, navigation }) => {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.arrowIcon} onPress={() => { navigation.goBack(null) }}>
-          <FontAwesomeIcon icon={faChevronLeft} color="#a3a098" size={20} />
+          <AntDesign name="left" color="#a3a098" size={20} />
         </TouchableOpacity>
 
         <View style={styles.searchForm}>
-          <FontAwesomeIcon icon={faMagnifyingGlass} color="#35095c" style={styles.searchIcon} size={20} />
+          <EvilIcons name="search" color="#35095c" style={styles.searchIcon} size={20} />
           <TextInput
             style={styles.textInput}
             onChangeText={setQuery}
@@ -53,7 +51,7 @@ const SearchResultScreen = ({ route, navigation }) => {
             value={query}
           />
           <TouchableOpacity style={styles.submitIcon} onPress={() => handleQuerySubmit()}>
-            <FontAwesomeIcon icon={faArrowRight} color="#35095c" size={20} />
+            <AntDesign name="arrowright" color="#35095c" size={20} />
           </TouchableOpacity>
         </View>
       </View>

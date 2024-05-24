@@ -3,8 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { StyleSheet, View, TouchableOpacity, Text, ScrollView } from 'react-native';
 import CategoryBoxItem from '../CategoryBoxItem';
 
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faArrowRight } from '@fortawesome/free-solid-svg-icons/faArrowRight';
+import AntDesign from '@expo/vector-icons/AntDesign';
 
 const Categories = ({ navigation, carousel }) => {
   return (
@@ -16,7 +15,7 @@ const Categories = ({ navigation, carousel }) => {
           onPress={() => navigation.navigate('Categories', { title: carousel.title, query: carousel.title })}
         >
           <Text style={styles.linkText}>View all</Text>
-          <FontAwesomeIcon icon={faArrowRight} color="#35095c" size={14} style={styles.linkIcon} />
+          <AntDesign name="arrowright" size={14} style={styles.linkIcon} />
         </TouchableOpacity>
       </View>
 
@@ -44,10 +43,10 @@ const styles = StyleSheet.create({
   },
   topic: {
     fontSize: 14,
-    // fontWeight: '400',
   },
   link: {
     flexDirection: 'row',
+    alignItems: 'center'
   },
   linkText: {
     fontSize: 14,

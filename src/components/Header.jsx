@@ -1,21 +1,21 @@
 import { StyleSheet, View, Image, Text, TouchableOpacity, TextInput } from 'react-native';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faChevronLeft } from '@fortawesome/free-solid-svg-icons/faChevronLeft';
-import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons/faMagnifyingGlass';
+
+import EvilIcons from '@expo/vector-icons/EvilIcons';
+import AntDesign from '@expo/vector-icons/AntDesign';
 
 const Header = ({ navigation, title }) => {
 
   return (
     <View style={styles.header}>
       <TouchableOpacity style={styles.arrowIcon} onPress={() => { navigation.goBack() }}>
-        <FontAwesomeIcon icon={faChevronLeft} color="#a3a098" size={20} />
+        <AntDesign name="left" color="#a3a098" size={20} />
       </TouchableOpacity>
 
       <Text style={styles.title}>{title}</Text>
 
       <View style={styles.iconContainer}>
         <TouchableOpacity onPress={() => navigation.navigate('Search')}>
-          <FontAwesomeIcon icon={faMagnifyingGlass} color="#35095c" style={styles.icon} size={20} />
+          <EvilIcons name="search" color="#35095c" style={styles.icon} size={24} />
         </TouchableOpacity>
       </View>
     </View>
