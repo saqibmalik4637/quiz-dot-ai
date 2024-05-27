@@ -23,7 +23,7 @@ const CategoriesList = ({ navigation, query }) => {
                   <ImageBackground
                     style={styles.image}
                     imageStyle={{ borderRadius: 20 }}
-                    source={category.image}
+                    source={{uri: category.image_url}}
                     resizeMode="cover">
                     <View style={styles.imageInner}>
                       <Text numberOfLines={1} style={styles.text}>{category.name}</Text>

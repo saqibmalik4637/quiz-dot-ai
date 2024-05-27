@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, ActivityIndicator, Image } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import { StyleSheet, View, ActivityIndicator, Image, Button } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
+
+import { useVideoPlayer, VideoView } from 'expo-video';
 
 import { getToken } from '../config/token';
 
@@ -42,7 +44,6 @@ const LoadingScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Image style={styles.logo} source={require('../../assets/logo.png')} />
-      <ActivityIndicator size="large" color="#35095c" />
     </View>
   );
 };
@@ -50,13 +51,13 @@ const LoadingScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#ffffff',
     alignItems: 'center',
-    paddingTop: 260,
+    justifyContent: 'center',
   },
   logo: {
-    height: 250,
-    width: 250,
+    height: 300,
+    width: 300,
   },
 });
 

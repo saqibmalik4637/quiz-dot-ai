@@ -26,9 +26,9 @@ const QuizzesList = ({ navigation, category, query }) => {
                 <Image style={styles.quizImage} source={quiz.image} />
 
                 <View style={styles.quizDetails}>
-                  <Text style={styles.name}>{quiz.name}</Text>
+                  <Text style={styles.name} numberOfLines={1}>{quiz.name}</Text>
                   <Text style={styles.smallText}>{quiz.questions_count} Questions</Text>
-                  <Text style={styles.smallText}>{quiz.tags_string}</Text>
+                  <Text style={styles.smallText} numberOfLines={1}>{quiz.tags_string}</Text>
                 </View>
               </View>
             </Pressable>

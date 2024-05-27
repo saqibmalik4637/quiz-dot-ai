@@ -32,7 +32,8 @@
     },
     "owner": "saqibmalik",
     "plugins": [
-      "expo-build-properties"
+      "expo-build-properties",
+      "expo-video"
     ]
   },
   "react-native-google-mobile-ads": {

@@ -260,21 +260,19 @@ const PlayRoomScreen = ({ route, navigation }) => {
                         </View>
                       )
                     }) }
+
+                    { result ? 
+                      <Pressable
+                        style={[styles.primaryButton, styles.buttonShadow]}
+                        onPress={() => nextQuestion()}>
+                        <Text style={styles.primaryButtonText}>{ questionIndex + 1 < questions.length ? 'NEXT' : 'SEE REPORT CARD' }</Text>
+                      </Pressable>
+                    : <Pressable style={[styles.primaryButtonInvert, styles.buttonShadow]}>
+                        <Text style={styles.primaryButtonInvertText}>{ questionIndex + 1 < questions.length ? 'NEXT' : 'SEE REPORT CARD' }</Text>
+                      </Pressable>
+                    }
                   </ScrollView>
                 </View>
-              </View>
-
-              <View style={{justifyContent: 'flex-end'}}>
-              { result ? 
-                <Pressable
-                  style={[styles.primaryButton, styles.buttonShadow]}
-                  onPress={() => nextQuestion()}>
-                  <Text style={styles.primaryButtonText}>{ questionIndex + 1 < questions.length ? 'NEXT' : 'SEE REPORT CARD' }</Text>
-                </Pressable>
-              : <Pressable style={[styles.primaryButtonInvert, styles.buttonShadow]}>
-                  <Text style={styles.primaryButtonInvertText}>{ questionIndex + 1 < questions.length ? 'NEXT' : 'SEE REPORT CARD' }</Text>
-                </Pressable>
-              }
               </View>
             </View>
           }
@@ -356,12 +354,13 @@ const styles = StyleSheet.create({
   },
 
   questionContainer: {
-    height: '40%',
+    minHeight: '30%',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#ded5e6',
     borderRadius: 50,
-    padding: 15
+    paddingHorizontal: 10,
+    marginTop: 10,
   },
 
   questionContent: {
@@ -393,6 +392,7 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     borderRadius: 50,
     shadowColor: 'black',
+    marginTop: 10,
   },
 
   primaryButtonInvert: {
@@ -403,6 +403,7 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     borderRadius: 50,
     shadowColor: 'black',
+    marginTop: 10,
   },
 
   primaryButtonText: {

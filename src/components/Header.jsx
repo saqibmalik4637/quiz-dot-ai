@@ -7,9 +7,11 @@ const Header = ({ navigation, title }) => {
 
   return (
     <View style={styles.header}>
-      <TouchableOpacity style={styles.arrowIcon} onPress={() => { navigation.goBack() }}>
-        <AntDesign name="left" color="#a3a098" size={20} />
-      </TouchableOpacity>
+      <View style={styles.iconContainer}>
+        <TouchableOpacity style={styles.arrowIcon} onPress={() => { navigation.goBack() }}>
+          <AntDesign name="left" color="#a3a098" size={24} />
+        </TouchableOpacity>
+      </View>
 
       <Text style={styles.title}>{title}</Text>
 
@@ -27,6 +29,7 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     marginTop: 10,
     marginBottom: 20,
     paddingHorizontal: 10,
@@ -35,14 +38,15 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   title: {
-    fontSize: 30,
+    fontSize: 24,
   },
   iconContainer: {
     justifyContent: 'center',
+    alignItems: 'center',
   },
   icon: {
-    height: 30,
-    width: 30,
+    // height: 30,
+    // width: 30,
   },
 });
 

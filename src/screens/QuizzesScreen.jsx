@@ -7,9 +7,9 @@ const QuizzesScreen = ({ route, navigation }) => {
     <View style={styles.container}>
       <Header navigation={navigation} title={route.params.title} />
       { route.params.category ? <>
-        <Image style={styles.bannerImage} source={route.params.category.image} />
+        <Image style={styles.bannerImage} source={{uri: route.params.category.image_url}} />
         <View style={styles.details}>
-          <Text style={styles.text}>{route.params.category.name}</Text>
+          <Text style={[styles.text, {width: '70%'}]}>{route.params.category.name}</Text>
           <Text style={styles.text}>{route.params.category.quizzes_count} quizzes</Text>
         </View>
         <QuizzesList navigation={navigation} category={route.params.category} />
@@ -48,8 +48,8 @@ const styles = StyleSheet.create({
   },
 
   text: {
-    fontSize: 20,
-    // fontWeight: '600',
+    fontSize: 16,
+    flexWrap: 'wrap',
   }
 });
 
