@@ -7,7 +7,7 @@ export const getRequest = (endpoint, params = {}) => {
     return response
   })
   .catch((error) => {
-    return error.response
+    return error
   })
 }
 
@@ -30,7 +30,7 @@ export const postRequest = (endpoint, body = {}) => {
     return response
   })
   .catch((error) => {
-    return error.response
+    return error
   })
 }
 

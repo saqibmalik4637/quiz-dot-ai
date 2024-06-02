@@ -23,7 +23,7 @@ const QuizzesList = ({ navigation, category, query }) => {
           return (
             <Pressable style={styles.pressable} key={i} onPress={() => navigation.navigate('Quiz', { quiz: quiz })}>
               <View style={styles.quizContainer}>
-                <Image style={styles.quizImage} source={quiz.image} />
+                <Image style={styles.quizImage} source={{uri: quiz.image_url}} />
 
                 <View style={styles.quizDetails}>
                   <Text style={styles.name} numberOfLines={1}>{quiz.name}</Text>

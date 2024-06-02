@@ -6,6 +6,7 @@ import carouselReducer from './reducers/carousels/carouselSlice';
 import questionReducer from './reducers/questions/questionSlice';
 import userReducer from './reducers/users/userSlice';
 import reportCardReducer from './reducers/report_cards/reportCardSlice';
+import roomReducer from './reducers/rooms/roomSlice';
 
 export default configureStore({
   reducer: {
@@ -16,5 +17,6 @@ export default configureStore({
     question: questionReducer,
     user: userReducer,
     reportCard: reportCardReducer,
+    room: roomReducer,
   },
 });

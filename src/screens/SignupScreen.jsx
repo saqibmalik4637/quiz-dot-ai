@@ -78,7 +78,7 @@ const SignupScreen = ({ navigation }) => {
         </View>
 
         <View style={styles.screenDescription}>
-          <Text style={styles.screenDescription.text}>Unlock the treasure trove of quizzes tailored just for you! Share a sprinkle of your details, and we'll conjure up the perfect quiz potion for your entertainment delight. Let's get started on this adventure together! 🚀✨</Text>
+          {/*<Text style={styles.screenDescription.text}>Unlock the treasure trove of quizzes tailored just for you! Share a sprinkle of your details, and we'll conjure up the perfect quiz potion for your entertainment delight. Let's get started on this adventure together! 🚀✨</Text>*/}
         </View>
       </View>
 

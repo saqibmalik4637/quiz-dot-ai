@@ -1,26 +1,42 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, View, Image, ScrollView, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Image, ScrollView, Text, TouchableOpacity, TextInput } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchCarouselsAction } from '../reducers/carousels/carouselAction';
 import { selectCarousels } from '../reducers/carousels/carouselSlice';
+import { joinRoomAction } from '../reducers/rooms/roomAction';
+import { selectRoom } from '../reducers/rooms/roomSlice';
+
 import Header from '../components/Header';
 import QuizCarousel from '../components/carousels/Quizzes';
 import CategoryCarousel from '../components/carousels/Categories';
 
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import AntDesign from '@expo/vector-icons/AntDesign';
 
 const HomeScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const carousels = useSelector(selectCarousels);
+  const { newUserJoined, room } = useSelector(selectRoom);
   const scrollYRef = useRef(0);
   const [showHeader, setShowHeader] = useState(true);
+  const [joiningCode, setJoiningCode] = useState(null);
 
   useEffect(() => {
     if (carousels.length === 0) {
       dispatch(fetchCarouselsAction());
     }
   }, [dispatch, fetchCarouselsAction, carousels]);
+
+  const joinRoom = () => {
+    dispatch(joinRoomAction(joiningCode));
+  }
+
+  useEffect(() => {
+    if (newUserJoined) {
+      navigation.navigate('JoiningRoom', { room: room })
+    }
+  }, [newUserJoined, room]);
 
   return (
     <View style={styles.container}>
@@ -39,6 +55,19 @@ const HomeScreen = ({ navigation }) => {
           </View>
         </View>
       }
+
+      <Text>Joining Code</Text>
+      <View style={styles.inputGroup}>
+        <TextInput
+          style={styles.textInput}
+          onChangeText={setJoiningCode}
+          value={joiningCode}
+        />
+
+        <TouchableOpacity style={styles.submitIcon} onPress={joinRoom}>
+          <AntDesign name="arrowright" color="#35095c" size={20} />
+        </TouchableOpacity>
+      </View>
 
       { carousels &&
         <ScrollView
@@ -101,6 +130,24 @@ const styles = StyleSheet.create({
   },
   carousel: {
     marginBottom: 20,
+  },
+  inputGroup: {
+    width: '90%',
+    marginHorizontal: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  },
+  textInput: {
+    fontSize: 18,
+    height: 40,
+    width: '80%',
+    borderBottomWidth: 1,
+    borderBottomColor: '#35095c',
+    justifyContent: 'center'
+  },
+  submitIcon: {
+    justifyContent: 'center',
+    alignItems: 'center'
   }
 });
 

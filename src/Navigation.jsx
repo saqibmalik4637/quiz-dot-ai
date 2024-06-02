@@ -12,6 +12,7 @@ import CategoriesScreen from './screens/CategoriesScreen';
 import QuizzesScreen from './screens/QuizzesScreen';
 import QuizScreen from './screens/QuizScreen';
 import SearchResultScreen from './screens/SearchResultScreen';
+import JoiningRoomScreen from './screens/JoiningRoomScreen';
 import PlayRoomScreen from './screens/PlayRoomScreen';
 import ResultScreen from './screens/ResultScreen';
 import PrivacyPolicyScreen from './screens/PrivacyPolicyScreen';
@@ -31,6 +32,7 @@ const Navigation = () => {
         <Stack.Screen name="Categories" component={CategoriesScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Quizzes" component={QuizzesScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Quiz" component={QuizScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="JoiningRoom" component={JoiningRoomScreen} options={{ headerShown: false }} />
         <Stack.Screen name="PlayRoom" component={PlayRoomScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Result" component={ResultScreen} options={{ headerShown: false }} />
         <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} options={{ title: 'Privacy Policy' }} />

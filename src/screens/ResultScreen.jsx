@@ -9,7 +9,7 @@ import { createReportCardReportCardInitialStateAction } from '../reducers/report
 import { useInterstitialAd, TestIds } from 'react-native-google-mobile-ads';
 
 const ResultScreen = ({ route, navigation }) => {
-  const { isLoaded, isClosed, load, show } = useInterstitialAd("ca-app-pub-3081698164560598/7924515371");
+  const { isLoaded, isClosed, load, show } = useInterstitialAd(TestIds.INTERSTITIAL);
 
   const dispatch = useDispatch();
   const screenWidth = Dimensions.get("window").width;

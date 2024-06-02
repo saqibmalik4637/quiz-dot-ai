@@ -9,6 +9,13 @@ import { useSelector, useDispatch } from 'react-redux';
 import { setQuestionsInitialStateAction } from '../reducers/questions/questionAction';
 import { fetchingQuestions, fetchedQuestions } from '../reducers/questions/questionSlice';
 
+import { fetchRoomAction,
+         createRoomAction,
+         setFetchRoomInitialStateAction,
+         setCreateRoomInitialStateAction } from '../reducers/rooms/roomAction';
+
+import { selectRoom } from '../reducers/rooms/roomSlice';
+
 import {
   markFavoritedInitialStateAction,
   unmarkFavoritedInitialStateAction,
@@ -21,6 +28,8 @@ import { selectQuiz } from '../reducers/quizzes/quizSlice';
 
 const QuizScreen = ({ route, navigation }) => {
   const dispatch = useDispatch();
+  const { creatingRoom, createdRoom, room } = useSelector(selectRoom);
+
   const [currentQuiz, setCurrentQuiz] = useState(null);
 
   const {
@@ -33,6 +42,7 @@ const QuizScreen = ({ route, navigation }) => {
     setCurrentQuiz(route.params.quiz);
     dispatch(markFavoritedInitialStateAction());
     dispatch(unmarkFavoritedInitialStateAction());
+    dispatch(setCreateRoomInitialStateAction());
   }, [route]);
 
   useEffect(() => {
@@ -63,11 +73,21 @@ const QuizScreen = ({ route, navigation }) => {
     dispatch(unmarkFavoritedAction({quizId: currentQuiz.id}));
   }
 
+  const createRoom = () => {
+    dispatch(createRoomAction({ quiz_id: currentQuiz.id }));
+  }
+
+  useEffect(() => {
+    if (!creatingRoom && createdRoom && Object.keys(room).length > 0) {
+      navigation.navigate('JoiningRoom', { room: room })
+    }
+  }, [creatingRoom, createdRoom, room]);
+
   return (
     <>
       { currentQuiz &&
         <View style={styles.container}>
-          <View contentContainerStyle={styles.contentContainerFlex} style={styles.contentContainer}>
+          <View style={styles.contentContainer}>
             <View style={styles.header}>
               <TouchableOpacity style={styles.arrowIcon} onPress={() => { navigation.goBack(null) }}>
                 <Text style={styles.backButton}>X</Text>
@@ -87,7 +107,7 @@ const QuizScreen = ({ route, navigation }) => {
               </View>
             </View>
 
-            <Image style={styles.bannerImage} source={currentQuiz.image} />
+            <Image style={styles.bannerImage} source={{uri: currentQuiz.image_url}} />
 
             <View style={styles.details}>
               <Text style={styles.text}>{currentQuiz.name}</Text>
@@ -108,20 +128,27 @@ const QuizScreen = ({ route, navigation }) => {
               </View>
             </View>
 
-            <View style={styles.descriptionArea}>
+            <ScrollView contentContainerStyle={styles.descriptionAreaContainer} style={styles.descriptionArea} showsVerticalScrollIndicator={false}>
               <Text style={styles.descriptionHeading}>Description</Text>
 
               <Text style={styles.descriptionText}>
                 {currentQuiz.description}
+                {currentQuiz.description}
               </Text>
-            </View>
+            </ScrollView>
           </View>
 
           <View style={styles.footer}>
             <Pressable
-              style={[styles.primaryButton, styles.buttonShadow]}
+              style={[styles.primaryButton, styles.buttonShadow, styles.footerButton]}
               onPress={() => goToPlayRoom()}>
               <Text style={styles.primaryButtonText}>LET'S PLAY</Text>
+            </Pressable>
+
+            <Pressable
+              style={[styles.primaryButtonInvert, styles.buttonShadow, styles.footerButton]}
+              onPress={createRoom}>
+              <Text style={styles.primaryButtonInvertText}>Play with Friends</Text>
             </Pressable>
           </View>
         </View>
@@ -157,7 +184,7 @@ const styles = StyleSheet.create({
     // fontWeight: '900'
   },
   arrowIcon: {
-    marginTop: 10,
+    // marginTop: 10,
   },
   title: {
     fontSize: 30,
@@ -173,7 +200,7 @@ const styles = StyleSheet.create({
   bannerImage: {
     flex: 1,
     width: '100%',
-    maxHeight: 200,
+    minHeight: 200,
     resizeMode: 'cover',
     borderRadius: 20,
   },
@@ -217,40 +244,55 @@ const styles = StyleSheet.create({
     marginTop: 20
   },
 
+  descriptionAreaContainer: {
+    alignItems: 'center'
+  },
+
   descriptionHeading: {
     fontSize: 30
   },
 
   descriptionText: {
+    textAlign: 'center',
     paddingVertical: 10,
     fontSize: 18,
-    // fontWeight: '100',
     lineHeight: 30,
     letterSpacing: 1
   },
 
   footer: {
     width: '100%',
-    marginBottom: 20
+    marginBottom: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  },
+
+  footerButton: {
+    width: '45%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    borderRadius: 50,
+    // marginBottom: 20,
+    shadowColor: 'black',
   },
 
   primaryButton: {
     backgroundColor: '#35095c',
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 20,
-    borderRadius: 50,
-    marginBottom: 20,
-    shadowColor: 'black',
+  },
+
+  primaryButtonInvert: {
+    backgroundColor: '#ded5e6',
   },
 
   primaryButtonText: {
-    fontSize: 16,
-    lineHeight: 21,
-    fontWeight: 'bold',
-    letterSpacing: 0.25,
+    fontSize: 14,
     color: '#fff',
+  },
+
+  primaryButtonInvertText: {
+    fontSize: 14,
+    color: '#35095c',
   },
 
   buttonShadow: {

@@ -6,7 +6,7 @@ const QuizBoxItem = ({quiz}) => {
       <ImageBackground
         style={styles.image}
         imageStyle={{ borderTopLeftRadius: 20, borderTopRightRadius: 20 }}
-        source={quiz.image}
+        source={{uri: quiz.image_url}}
         resizeMode="cover"
       >
         <View style={styles.imageInner}>
