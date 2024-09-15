@@ -1,3 +1,4 @@
+import Expo from 'expo';
 import axios from 'axios';
 import { axiosInstance, createAxiosInstanceWithToken } from './axiosInstance';
 
@@ -13,12 +14,17 @@ export const getRequest = (endpoint, params = {}) => {
 
 export const getRequestWithToken = async (endpoint, params = {}) => {
   try {
+    console.log("Endpoint", endpoint)
     const axiosInstanceWithToken = await createAxiosInstanceWithToken();
 
     const response = await axiosInstanceWithToken.get(`${endpoint}`, { params: params ?? {} });
 
     return response;
   } catch (error) {
+    if (endpoint === '/api/v1/me') {
+      console.log("response", response);
+      await AsyncStorage.removeItem('token');
+    }
     console.error("Error in getRequestWithToken:", error);
     return { error: 'Unable to fetch data' };
   }

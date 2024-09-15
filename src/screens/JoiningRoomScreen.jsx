@@ -6,7 +6,7 @@ import io from 'socket.io-client';
 import { setCreateRoomInitialStateAction } from '../reducers/rooms/roomAction';
 
 const JoiningRoomScreen = ({ route, navigation }) => {
-  const socket = io('https://tender-penguin-75.telebit.io');
+  const socket = io('https://b4dc-2401-4900-1c5b-41b3-b454-cf2b-d571-b0e.ngrok-free.app');
 
   const dispatch = useDispatch();
   const [currentRoom, setCurrentRoom] = useState(null);
