@@ -1,27 +1,39 @@
 import { useEffect, useState } from 'react';
 import { Dimensions, StyleSheet, View, Text, ScrollView, Pressable } from 'react-native';
 
+// import io from 'socket.io-client';
+
 import { useSelector, useDispatch } from 'react-redux';
 import QuizzesList from '../components/QuizzesList';
 
 import { createReportCardReportCardInitialStateAction } from '../reducers/report_cards/reportCardAction';
+import { getRoomScorebordAction } from '../reducers/rooms/roomAction';
+import { selectRoom } from '../reducers/rooms/roomSlice';
 
 import { useInterstitialAd, TestIds } from 'react-native-google-mobile-ads';
 
 const ResultScreen = ({ route, navigation }) => {
-  const { isLoaded, isClosed, load, show } = useInterstitialAd(TestIds.INTERSTITIAL);
+  // const socket = io('https://golden-vast-mongoose.ngrok-free.app');
+
+  const { isLoaded, isClosed, load, show } = useInterstitialAd("ca-app-pub-3081698164560598/7924515371");
 
   const dispatch = useDispatch();
+
+  const { scoreboard } = useSelector(selectRoom);
+
   const screenWidth = Dimensions.get("window").width;
 
-  const [reportCard, SetReportCard] = useState(null);
+  const [reportCard, setReportCard] = useState(null);
   const [grapghData, setGraphData] = useState([]);
   const [adWatched, setAdWatched] = useState(false);
+  const [room, setRoom] = useState(null);
+  const [roomScoreboard, setRoomScoreboard] = useState([]);
 
   useEffect(() => {
     dispatch(createReportCardReportCardInitialStateAction());
     setAdWatched(false);
     load();
+    // setRoom(route.params.room);
   }, [route, load]);
 
   useEffect(() => {
@@ -38,9 +50,25 @@ const ResultScreen = ({ route, navigation }) => {
 
   useEffect(() => {
     if (adWatched) {
-      SetReportCard(route.params.reportCard);
+      setReportCard(route.params.reportCard);
     }
   }, [adWatched]);
+
+  useEffect(() => {
+    if (room && room) {
+      dispatch(getRoomScorebordAction(room.id));
+
+      socket.on(`refresh-scoreboard-${room.id}`, (data) => {
+        setRoomScoreboard(data.scoreboard);
+      });
+    }
+  }, [room, dispatch]);
+
+  useEffect(() => {
+    if (scoreboard && scoreboard) {
+      setRoomScoreboard(scoreboard);
+    }
+  }, [scoreboard]);
 
   return (
     <View style={styles.container} showsVerticalScrollIndicator={false}>
@@ -52,7 +80,6 @@ const ResultScreen = ({ route, navigation }) => {
         <ScrollView style={styles.resultContainerParent} showsVerticalScrollIndicator={false}>
           <View style={styles.totalScore}>
             <Text style={styles.totalNumber}>{parseFloat(reportCard.score).toFixed(2)}</Text>
-            {/*<Text style={styles.totalText}>out of {reportCard.quiz_total_points}</Text>*/}
           </View>
 
           <View style={styles.scoreContainer}>
@@ -72,6 +99,34 @@ const ResultScreen = ({ route, navigation }) => {
             </View>
           </View>
 
+          { (room && room) &&
+            <View style={styles.otherUsersContainer}>
+              <Text style={styles.headerText}>ALL USERS</Text>
+
+              <View style={styles.allUsersList} showsVerticalScrollIndicator={false}>
+                { roomScoreboard &&
+                  <>
+                  { roomScoreboard.map((userItem, i) => {
+                    return <View key={i} style={styles.userItem}>
+                      <View style={styles.userItemInnerContainer}>
+                        <Text style={styles.userPosition}>{userItem.position}.</Text>
+                        <Text style={styles.userName}>{userItem.name}</Text>
+                      </View>
+
+                      <View style={styles.userItemInnerContainer}>
+                        { (userItem.in_progress && userItem.in_progress === true) ? (
+                            <Text style={styles.userScoreText}>In progress</Text>
+                          ) : (<Text style={styles.userScore}>{parseFloat(userItem.score).toFixed(2)}</Text>)
+                        }
+                      </View>
+                    </View>
+                  }) }
+                  </>
+                }
+              </View>
+            </View>
+          }
+
           <View style={styles.footerButton}>
             <Pressable style={[styles.primaryButtonInvert, styles.buttonShadow]} onPress={() => navigation.navigate('Home')}>
               <Text style={styles.primaryButtonInvertText}>GO TO HOME</Text>
@@ -90,6 +145,47 @@ const ResultScreen = ({ route, navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  otherUsersContainer: {
+    marginTop: 20,
+    alignItems: 'center',
+  },
+
+  allUsersList: {
+    marginVertical: 20,
+    marginHorizontal: 20,
+    width: '80%',
+  },
+
+  userItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+
+  userItemInnerContainer: {
+    flexDirection: 'row',
+  },
+
+  userPosition: {
+    fontSize: 30,
+    paddingRight: 20,
+    color: "#ded5e6"
+  },
+
+  userName: {
+    fontSize: 30,
+    color: "#ded5e6"
+  },
+
+  userScore: {
+    fontSize: 30,
+    color: "#ded5e6"
+  },
+
+  userScoreText: {
+    fontSize: 15,
+    color: '#ded5e6'
+  },
+
   container: {
     flex: 1,
     justifyContent: 'start',

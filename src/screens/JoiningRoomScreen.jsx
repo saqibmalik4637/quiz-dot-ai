@@ -1,101 +1,154 @@
-import React, { useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { selectCurrentUser, selectFetchedCurrentUser } from '../reducers/users/userSlice';
 import { StyleSheet, View, Text, TouchableOpacity, Image, ScrollView, Pressable } from 'react-native';
-import io from 'socket.io-client';
+// import io from 'socket.io-client';
 
+import { setQuestionsInitialStateAction } from '../reducers/questions/questionAction';
 import { setCreateRoomInitialStateAction } from '../reducers/rooms/roomAction';
+import { markPlayedAction } from '../reducers/quizzes/quizAction';
 
 const JoiningRoomScreen = ({ route, navigation }) => {
-  const socket = io('https://b4dc-2401-4900-1c5b-41b3-b454-cf2b-d571-b0e.ngrok-free.app');
+  // // const socket = io('https://golden-vast-mongoose.ngrok-free.app');
+  // const ws = useRef(null);
 
-  const dispatch = useDispatch();
-  const [currentRoom, setCurrentRoom] = useState(null);
-  const [users, setUsers] = useState([]);
+  // const currentUser = useSelector(selectCurrentUser);
+  // const dispatch = useDispatch();
+  // const [currentRoom, setCurrentRoom] = useState(null);
+  // const [users, setUsers] = useState([]);
 
-  useEffect(() => {
-    console.log("Error in first")
-    setCurrentRoom(route.params.room);
-    dispatch(setCreateRoomInitialStateAction());
-  }, [route]);
+  // useEffect(() => {
+  //   setCurrentRoom(route.params.room);
+  // }, [route]);
 
-  useEffect(() => {
-    console.log("Error in second")
-    if (currentRoom && currentRoom && Object.keys(currentRoom).length > 0) {
-      setUsers(currentRoom.users);
+  // useEffect(() => {
+  //   if (currentRoom && currentRoom && Object.keys(currentRoom).length > 0) {
+  //     setUsers(currentRoom.users);
 
-      socket.on('connect', () => {
-        console.log('Connected to the server');
-      });
+  //     const subscriptionMessage = JSON.stringify({
+  //       command: 'subscribe',
+  //       identifier: JSON.stringify({
+  //         channel: 'RoomChannel',
+  //         room_id: currentRoom.id,
+  //       }),
+  //     });
 
-      socket.on('disconnect', () => {
-        console.log('Disconnected from the server');
-      });
+  //     ws.current = new WebSocket('wss://golden-vast-mongoose.ngrok-free.app/cable');
 
-      socket.on(`new_user_joined${currentRoom.id}`, (data) => {
-        setUsers((prevUsers) => [...prevUsers, data.user]);
-      });
+  //     ws.current.onopen = () => {
+  //       console.log('WebSocket connected');
+  //       ws.current.send(subscriptionMessage);
+  //     };
 
-      return () => {
-        socket.disconnect();
-      };
-    }
-  }, [currentRoom]);
+  //     ws.current.onmessage = (event) => {
+  //       const response = JSON.parse(event.data);
 
-  const startQuiz = () => {
-    console.log("Start Quiz");
-  }
+  //       if (response.type === 'ping') return;
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.iconContainer}>
-          <TouchableOpacity onPress={() => { navigation.goBack(null) }}>
-            <Text style={styles.backButton}>X</Text>
-          </TouchableOpacity>
-        </View>
-        <Text style={styles.headerTitle}>Waiting for Players...</Text>
-      </View>
+  //       console.log("response", response);
+  //       if (response.message) {
+  //         const { event, user } = response.message;
 
-      { currentRoom &&
-        <>
-          <View style={styles.joiningCode}>
-            <Text style={styles.joiningCodeText}>JOINING CODE: {currentRoom.joining_code}</Text>
-          </View>
-          <View style={styles.quizDetails}>
-            <View style={styles.quizImageAndName}>
-              <Image style={styles.quizImage} source={{uri: currentRoom.quiz_image}} />
-              <Text style={styles.quizName}>{currentRoom.quiz_name}</Text>
-            </View>
+  //         if (event === 'new_user_joined') {
+  //           setUsers((prevUsers) => [...prevUsers, user]);
+  //         } else if (event === 'start_quiz') {
+  //           // Handle quiz start logic
+  //           console.log('Quiz started');
+  //           navigation.navigate('PlayRoom', { quiz: currentRoom.quiz });
+  //         }
+  //       }
+  //     };
 
-            { users &&
-              <View style={styles.playersCount}>
-                <Text style={styles.playersCountText}>{users.length} players have joined</Text>
-              </View>
-            }
-          </View>
+  //     ws.current.onclose = () => console.log('WebSocket closed');
+  //     ws.current.onerror = (error) => console.error('WebSocket error:', error);
 
-          { users &&
-            <View style={styles.players}>
-              <ScrollView contentContainerStyle={styles.playersAlignment} style={styles.playersScrollView}>
-                {users.map((user, index) => (
-                  <View key={index} style={styles.playerPill}>
-                    <Image style={styles.playerImage} source={{uri: "https://t4.ftcdn.net/jpg/05/42/36/11/360_F_542361185_VFRJWpR2FH5OiAEVveWO7oZnfSccZfD3.jpg"}} />
-                    <Text style={styles.playerName}>{user.fullname}</Text>
-                  </View>
-                ))}
-              </ScrollView>
-            </View>
-          }
+  //     return () => ws.current.close();
 
-          <View style={styles.footer}>
-            <Pressable style={[styles.primaryButtonInvert, styles.buttonShadow]} onPress={() => startQuiz()}>
-              <Text style={styles.primaryButtonInvertText}>Start</Text>
-            </Pressable>
-          </View>
-        </>
-      }
-    </View>
-  );
+  //     // socket.on('connect', () => {
+  //     //   console.log('Connected to the server');
+  //     // });
+
+  //     // socket.on('disconnect', () => {
+  //     //   console.log('Disconnected to the server');
+  //     // });
+
+  //     // socket.on(`new_user_joined${currentRoom.id}`, (data) => {
+  //     //   setUsers((prevUsers) => [...prevUsers, data.user]);
+  //     // });
+
+  //     // socket.on(`start-quiz-${currentRoom.id}`, (data) => {
+  //     //   dispatch(markPlayedAction({quizId: currentRoom.quiz.id}));
+  //     //   dispatch(setQuestionsInitialStateAction());
+  //     //   navigation.navigate('PlayRoom', { quiz: currentRoom.quiz, multipleUsers: true, room: currentRoom });
+  //     // });
+  //   }
+  // }, [currentRoom]);
+
+  // const startQuiz = () => {
+  //   // socket.emit('start-quiz', { room_id: currentRoom.id });
+  //   // const subscription = cable.subscriptions.create(
+  //   //   { channel: "RoomChannel", room_id: currentRoom.id },
+  //   //   {}
+  //   // );
+
+  //   // subscription.perform("start_quiz", { room_id: currentRoom.id });
+  // }
+
+  // return (
+  //   <View style={styles.container}>
+  //     <View style={styles.header}>
+  //       <View style={styles.iconContainer}>
+  //         <TouchableOpacity onPress={() => { navigation.goBack(null) }}>
+  //           <Text style={styles.backButton}>X</Text>
+  //         </TouchableOpacity>
+  //       </View>
+  //       <Text style={styles.headerTitle}>Waiting for Players...</Text>
+  //     </View>
+
+  //     { currentRoom &&
+  //       <>
+  //         <View style={styles.joiningCode}>
+  //           <Text style={styles.joiningCodeText}>JOINING CODE: {currentRoom.joining_code}</Text>
+  //         </View>
+  //         <View style={styles.quizDetails}>
+  //           <View style={styles.quizImageAndName}>
+  //             <Image style={styles.quizImage} source={{uri: currentRoom.quiz_image}} />
+  //             <Text style={styles.quizName}>{currentRoom.quiz_name}</Text>
+  //           </View>
+
+  //           { users &&
+  //             <View style={styles.playersCount}>
+  //               <Text style={styles.playersCountText}>{users.length} {users.length == 1 ? 'player' : 'players'} have joined</Text>
+  //             </View>
+  //           }
+  //         </View>
+
+  //         { users &&
+  //           <View style={styles.players}>
+  //             <ScrollView contentContainerStyle={styles.playersAlignment} style={styles.playersScrollView}>
+  //               {users.map((user, index) => (
+  //                 <View key={index} style={styles.playerPill}>
+  //                   <Image style={styles.playerImage} source={{uri: "https://t4.ftcdn.net/jpg/05/42/36/11/360_F_542361185_VFRJWpR2FH5OiAEVveWO7oZnfSccZfD3.jpg"}} />
+  //                   <Text style={styles.playerName}>{user.fullname}</Text>
+  //                 </View>
+  //               ))}
+  //             </ScrollView>
+  //           </View>
+  //         }
+
+  //         <View style={styles.footer}>
+  //           { currentUser.id === currentRoom.user_id ? (
+  //             <Pressable style={[styles.primaryButtonInvert, styles.buttonShadow]} onPress={() => startQuiz()}>
+  //               <Text style={styles.primaryButtonInvertText}>Start</Text>
+  //             </Pressable>
+  //           ) : (
+  //             <Text style={styles.quizName}>Waiting for host to start</Text>
+  //           ) }
+  //         </View>
+  //       </>
+  //     }
+  //   </View>
+  // );
 }
 
 const styles = StyleSheet.create({

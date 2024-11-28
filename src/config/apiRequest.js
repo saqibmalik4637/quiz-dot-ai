@@ -1,6 +1,7 @@
 import Expo from 'expo';
 import axios from 'axios';
 import { axiosInstance, createAxiosInstanceWithToken } from './axiosInstance';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const getRequest = (endpoint, params = {}) => {
   return axiosInstance.get(`${endpoint}`, { params: params ?? {} })
@@ -14,7 +15,6 @@ export const getRequest = (endpoint, params = {}) => {
 
 export const getRequestWithToken = async (endpoint, params = {}) => {
   try {
-    console.log("Endpoint", endpoint)
     const axiosInstanceWithToken = await createAxiosInstanceWithToken();
 
     const response = await axiosInstanceWithToken.get(`${endpoint}`, { params: params ?? {} });
@@ -22,7 +22,6 @@ export const getRequestWithToken = async (endpoint, params = {}) => {
     return response;
   } catch (error) {
     if (endpoint === '/api/v1/me') {
-      console.log("response", response);
       await AsyncStorage.removeItem('token');
     }
     console.error("Error in getRequestWithToken:", error);

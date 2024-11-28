@@ -11,6 +11,7 @@ import { selectCurrentUser, selectFetchedCurrentUser } from '../reducers/users/u
 
 import { fetchCarouselsAction } from '../reducers/carousels/carouselAction';
 import { selectCarousels } from '../reducers/carousels/carouselSlice';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoadingScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -32,6 +33,9 @@ const LoadingScreen = ({ navigation }) => {
   useEffect(() => {
     if (fetchedCurrentUser && (currentUser && Object.keys(currentUser).length > 0)) {
       dispatch(fetchCarouselsAction());
+    } else if (fetchedCurrentUser && (!currentUser || (currentUser && Object.keys(currentUser).length === 0))) {
+      AsyncStorage.removeItem('token');
+      navigation.navigate('Signup')
     }
   }, [fetchedCurrentUser, currentUser]);
 
@@ -54,11 +58,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  logo: {
-    height: 300,
-    width: 300,
-  },
+  }
 });
 
 export default LoadingScreen;

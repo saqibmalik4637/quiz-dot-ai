@@ -31,6 +31,7 @@ const QuizScreen = ({ route, navigation }) => {
   const { creatingRoom, createdRoom, room } = useSelector(selectRoom);
 
   const [currentQuiz, setCurrentQuiz] = useState(null);
+  const [createRoomCalled, setCreateRoomCalled] = useState(false);
 
   const {
     requestedMarkFavorite,
@@ -62,7 +63,7 @@ const QuizScreen = ({ route, navigation }) => {
   const goToPlayRoom = () => {
     dispatch(markPlayedAction({quizId: currentQuiz.id}));
     dispatch(setQuestionsInitialStateAction());
-    navigation.navigate('PlayRoom', { quiz: currentQuiz });
+    navigation.navigate('PlayRoom', { quiz: currentQuiz, multipleUsers: false });
   }
 
   const markFavorite = () => {
@@ -75,13 +76,15 @@ const QuizScreen = ({ route, navigation }) => {
 
   const createRoom = () => {
     dispatch(createRoomAction({ quiz_id: currentQuiz.id }));
+    setCreateRoomCalled(true);
   }
 
   useEffect(() => {
-    if (!creatingRoom && createdRoom && Object.keys(room).length > 0) {
+    console.log("createRoomCalled", createRoomCalled);
+    if (createRoomCalled === true && !creatingRoom && createdRoom && Object.keys(room).length > 0) {
       navigation.navigate('JoiningRoom', { room: room })
     }
-  }, [creatingRoom, createdRoom, room]);
+  }, [creatingRoom, createdRoom, room, createRoomCalled]);
 
   return (
     <>
@@ -141,15 +144,15 @@ const QuizScreen = ({ route, navigation }) => {
           <View style={styles.footer}>
             <Pressable
               style={[styles.primaryButton, styles.buttonShadow, styles.footerButton]}
-              onPress={() => goToPlayRoom()}>
+              onPress={goToPlayRoom}>
               <Text style={styles.primaryButtonText}>LET'S PLAY</Text>
             </Pressable>
 
-            <Pressable
+            {/*<Pressable
               style={[styles.primaryButtonInvert, styles.buttonShadow, styles.footerButton]}
               onPress={createRoom}>
               <Text style={styles.primaryButtonInvertText}>Play with Friends</Text>
-            </Pressable>
+            </Pressable>*/}
           </View>
         </View>
       }
@@ -268,7 +271,7 @@ const styles = StyleSheet.create({
   },
 
   footerButton: {
-    width: '45%',
+    width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 12,

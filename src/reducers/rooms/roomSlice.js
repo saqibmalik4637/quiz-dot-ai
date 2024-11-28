@@ -12,6 +12,7 @@ export const roomSlice = createSlice({
     fetchRoomError: '',
 
     room: {},
+    scoreboard: [],
   },
 
   reducers: {
@@ -31,6 +32,9 @@ export const roomSlice = createSlice({
       state.newUserJoined = action.payload.success
       state.room = action.payload.room
     },
+    getScoreboard: (state, action) => {
+      state.scoreboard = action.payload.scoreboard
+    },
     setFetchRoomInitialState: (state, action) => {
       state.room = {}
       state.fetchRoomError = ''
@@ -46,6 +50,12 @@ export const roomSlice = createSlice({
   }
 });
 
-export const { createRoom, fetchRoom, joinRoom, setFetchRoomInitialState, setCreateRoomInitialState } = roomSlice.actions
+export const { createRoom,
+               fetchRoom,
+               joinRoom,
+               setFetchRoomInitialState,
+               setCreateRoomInitialState,
+               getScoreboard } = roomSlice.actions
+
 export const selectRoom = (state) => state.room
 export default roomSlice.reducer

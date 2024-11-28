@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { getToken } from './token';
 
-const BASE_URL = 'https://4e03-2401-4900-1c5b-1fe3-799e-2420-2ca0-236b.ngrok-free.app';
+const BASE_URL = 'https://quizwithai.in';
 
 const HEADERS = { "Content-Type": "application/json", "accept": "application/json" }
 

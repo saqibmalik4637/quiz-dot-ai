@@ -59,7 +59,7 @@ const SignupScreen = ({ navigation }) => {
   }, [tokenStored]);
 
   useEffect(() => {
-    if (fetchedCurrentUser && Object.keys(currentUser).length > 0) {
+    if (fetchedCurrentUser && currentUser && Object.keys(currentUser).length > 0) {
       dispatch(fetchCarouselsAction());
     }
   }, [fetchedCurrentUser, currentUser]);
@@ -105,7 +105,7 @@ const SignupScreen = ({ navigation }) => {
             />
           </View>
 
-          <View style={styles.inputGroup}>
+          {/*<View style={styles.inputGroup}>
             <Text style={styles.screenForm.text}>Country</Text>
 
             <TouchableOpacity
@@ -128,7 +128,7 @@ const SignupScreen = ({ navigation }) => {
               }}
               popularCountries={['en', 'in', 'us']}
             />
-          </View>
+          </View>*/}
 
           <Pressable
             style={[styles.primaryButton, styles.buttonShadow]}

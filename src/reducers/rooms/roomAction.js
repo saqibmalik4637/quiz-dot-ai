@@ -1,4 +1,6 @@
-import { createRoom, fetchRoom, joinRoom, setFetchRoomInitialState, setCreateRoomInitialState } from './roomSlice';
+import { createRoom, fetchRoom, joinRoom, getScoreboard,
+         setFetchRoomInitialState, setCreateRoomInitialState } from './roomSlice';
+
 import { getRequestWithToken, postRequestWithToken } from '../../config/apiRequest';
 
 export const fetchRoomAction = (roomId) => async (dispatch) => {
@@ -28,6 +30,16 @@ export const joinRoomAction = (joiningCode) => async (dispatch) => {
     dispatch(joinRoom({ success: true, room: res.data.room }))
   } else {
     dispatch(joinRoom({ success: false, room: {} }))
+  }
+}
+
+export const getRoomScorebordAction = (roomId) => async (dispatch) => {
+  const res = await getRequestWithToken(`/api/v1/rooms/${roomId}/scoreboard`, {});
+
+  if (res.status === 200) {
+    dispatch(getScoreboard({ success: true, scoreboard: res.data.scoreboard }))
+  } else {
+    dispatch(getScoreboard({ success: false, scoreboard: [] }))
   }
 }
 

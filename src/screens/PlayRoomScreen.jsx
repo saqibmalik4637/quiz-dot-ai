@@ -39,6 +39,7 @@ const PlayRoomScreen = ({ route, navigation }) => {
   const [totalScore, setTotalScore] = useState(0);
   const [perAnswerPoint, setPerAnswerPoint] = useState(null);
   const [allAnswers, setAllAnswers] = useState([]);
+  const [room, setRoom] = useState(null);
 
   const fetched = useSelector(fetchedQuestions);
   const fetching = useSelector(fetchingQuestions);
@@ -70,12 +71,20 @@ const PlayRoomScreen = ({ route, navigation }) => {
       given_answers: finalResult.allAnswers
     }
 
+    if (room) {
+      payload.room_id = room.id
+    }
+
     dispatch(createReportCardAction(payload));
   }
 
   useEffect(() => {
     dispatch(createReportCardReportCardInitialStateAction());
     setQuiz(route.params.quiz);
+
+    if (route.params.room) {
+      setRoom(route.params.room);
+    }
   }, [route]);
 
   useEffect(() => {
@@ -187,7 +196,7 @@ const PlayRoomScreen = ({ route, navigation }) => {
 
   useEffect(() => {
     if (!creatingReportCard && createdReportCard && (reportCard && Object.keys(reportCard).length > 0)) {
-      navigation.navigate('Result', { reportCard: reportCard });
+      navigation.navigate('Result', { reportCard: reportCard, room: room });
     }
   }, [reportCard, creatingReportCard, createdReportCard]);
 

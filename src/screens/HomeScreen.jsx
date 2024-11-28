@@ -33,7 +33,7 @@ const HomeScreen = ({ navigation }) => {
   }
 
   useEffect(() => {
-    if (newUserJoined) {
+    if (newUserJoined && room) {
       navigation.navigate('JoiningRoom', { room: room })
     }
   }, [newUserJoined, room]);
@@ -46,28 +46,31 @@ const HomeScreen = ({ navigation }) => {
 
           <View style={styles.iconContainer}>
             <TouchableOpacity onPress={() => navigation.navigate('Search')}>
-              <EvilIcons name="search" color="#35095c" style={styles.icon} size={24} />
+              <EvilIcons name="search" color="#35095c" style={styles.icon} size={28} />
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => navigation.navigate('PrivacyPolicy')}>
+            {/*<TouchableOpacity onPress={() => navigation.navigate('PrivacyPolicy')}>
               <MaterialIcons name="privacy-tip" size={20} color="#35095c" />
-            </TouchableOpacity>
+            </TouchableOpacity>*/}
           </View>
         </View>
       }
 
-      <Text>Joining Code</Text>
-      <View style={styles.inputGroup}>
-        <TextInput
-          style={styles.textInput}
-          onChangeText={setJoiningCode}
-          value={joiningCode}
-        />
+      {/*<View style={styles.joinRoomContainer}>
+        <Text style={styles.joinRoomHeading}>Play with friends</Text>
+        <Text style={styles.inputLabel}>Enter a room joining code:</Text>
+        <View style={styles.inputGroup}>
+          <TextInput
+            style={styles.textInput}
+            onChangeText={setJoiningCode}
+            value={joiningCode}
+          />
 
-        <TouchableOpacity style={styles.submitIcon} onPress={joinRoom}>
-          <AntDesign name="arrowright" color="#35095c" size={20} />
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity style={styles.submitIcon} onPress={joinRoom}>
+            <Text style={styles.buttonText}>Join</Text>
+          </TouchableOpacity>
+        </View>
+      </View>*/}
 
       { carousels &&
         <ScrollView
@@ -92,15 +95,45 @@ const HomeScreen = ({ navigation }) => {
           }) }
         </ScrollView>
       }
-
-      {/*<CategoryCarousel navigation={navigation} topic='Top Collections' />*/}
-      {/*<QuizCarousel navigation={navigation} topic='Trending Quiz' />*/}
-      {/*<QuizCarousel navigation={navigation} topic='Top Picks' />*/}
     </View>
   )
 };
 
 const styles = StyleSheet.create({
+  joinRoomContainer: {
+    backgroundColor: '#ded5e6',
+    width: '100%',
+    borderRadius: 20,
+    padding: 20,
+    marginTop: 20,
+    marginBottom: 20
+  },
+  joinRoomHeading: {
+    fontSize: 30,
+  },
+  inputGroup: {
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  },
+  textInput: {
+    fontSize: 18,
+    height: 40,
+    borderBottomWidth: 1,
+    borderBottomColor: '#35095c',
+    justifyContent: 'space-between',
+    width: '70%'
+  },
+  submitIcon: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#35095c',
+    paddingHorizontal: 20,
+    borderRadius: 20
+  },
+  buttonText: {
+    fontSize: 18,
+    color: '#ffffff',
+  },
   container: {
     paddingHorizontal: 10,
     paddingTop: 50,
@@ -113,10 +146,12 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-between',
+    marginBottom: 50
   },
   logo: {
-    height: 100,
-    width: 100,
+    width: 80,
+    height: '100%',
+    resizeMode: 'center'
   },
   iconContainer: {
     justifyContent: 'center',
@@ -130,24 +165,6 @@ const styles = StyleSheet.create({
   },
   carousel: {
     marginBottom: 20,
-  },
-  inputGroup: {
-    width: '90%',
-    marginHorizontal: 20,
-    flexDirection: 'row',
-    justifyContent: 'space-between'
-  },
-  textInput: {
-    fontSize: 18,
-    height: 40,
-    width: '80%',
-    borderBottomWidth: 1,
-    borderBottomColor: '#35095c',
-    justifyContent: 'center'
-  },
-  submitIcon: {
-    justifyContent: 'center',
-    alignItems: 'center'
   }
 });
 
