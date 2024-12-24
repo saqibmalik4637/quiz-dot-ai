@@ -22,35 +22,37 @@ const QuizzesScreen = ({ route, navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 30,
-    paddingTop: 50,
     flex: 1,
+    paddingHorizontal: 20,
+    // paddingTop: 30,
     backgroundColor: '#fff',
     alignItems: 'center',
-    justifyContent: 'start',
   },
 
   bannerImage: {
-    flex: 1,
     width: '100%',
-    maxHeight: 200,
+    height: 200,
     resizeMode: 'cover',
-    borderRadius: 20,
+    borderRadius: 15,
+    marginVertical: 15,
   },
 
   details: {
     width: '100%',
-    paddingHorizontal: 10,
+    paddingHorizontal: 15,
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 20,
+    marginTop: 10,
+    marginBottom: 20,
   },
 
   text: {
-    fontSize: 16,
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
     flexWrap: 'wrap',
-  }
+  },
 });
 
 export default QuizzesScreen;

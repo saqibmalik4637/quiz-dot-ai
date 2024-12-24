@@ -4,7 +4,8 @@ import {
   markFavoritedInitialState,
   unmarkFavorited,
   unmarkFavoritedInitialState,
-  markPlayed
+  markPlayed,
+  fetchQuizDetails
 } from './quizSlice';
 import { getRequestWithToken, postRequestWithToken } from '../../config/apiRequest';
 
@@ -19,6 +20,16 @@ export const fetchQuizzesAction = ({categoryId, query}) => async (dispatch) => {
     dispatch(fetchQuizzes({ quizzes: res.data.quizzes, error: '' }))
   } else {
     dispatch(fetchQuizzes({ quizzes: [], error: 'Unable to fetch quizzes' }))
+  }
+}
+
+export const fetchQuizDetailsAction = (quizId) => async (dispatch) => {
+  const res = await getRequestWithToken(`/api/v1/quizzes/${quizId}`, {});
+
+  if (res.status === 200) {
+    dispatch(fetchQuizDetails({quiz: res.data.quiz, error: ''}));
+  } else {
+    dispatch(fetchQuizDetails({error: 'Unable to fetch quiz details'}));
   }
 }
 

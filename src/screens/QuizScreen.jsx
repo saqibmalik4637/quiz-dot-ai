@@ -1,22 +1,32 @@
 import { useState, useEffect } from 'react';
-import { StyleSheet, View, Image, Text, TouchableOpacity, Pressable, ScrollView } from 'react-native';
+import { StyleSheet, View, Image, Text, TouchableOpacity,
+         Pressable, ScrollView } from 'react-native';
 
 import EmptyStar from '../components/icons/EmptyStar';
 import FilledStar from '../components/icons/FilledStar';
 
 import { useSelector, useDispatch } from 'react-redux';
 
-import { setQuestionsInitialStateAction } from '../reducers/questions/questionAction';
-import { fetchingQuestions, fetchedQuestions } from '../reducers/questions/questionSlice';
+import {
+  setQuestionsInitialStateAction
+} from '../reducers/questions/questionAction';
 
-import { fetchRoomAction,
-         createRoomAction,
-         setFetchRoomInitialStateAction,
-         setCreateRoomInitialStateAction } from '../reducers/rooms/roomAction';
+import {
+  fetchingQuestions,
+  fetchedQuestions
+} from '../reducers/questions/questionSlice';
+
+import {
+  fetchRoomAction,
+  createRoomAction,
+  setFetchRoomInitialStateAction,
+  setCreateRoomInitialStateAction
+} from '../reducers/rooms/roomAction';
 
 import { selectRoom } from '../reducers/rooms/roomSlice';
 
 import {
+  fetchQuizDetailsAction,
   markFavoritedInitialStateAction,
   unmarkFavoritedInitialStateAction,
   markFavoritedAction,
@@ -32,6 +42,8 @@ const QuizScreen = ({ route, navigation }) => {
 
   const [currentQuiz, setCurrentQuiz] = useState(null);
   const [createRoomCalled, setCreateRoomCalled] = useState(false);
+  const [isFavoritedState, setIsFavoritedState] = useState(false);
+  const [favoritedCountState, setFavoritedCountState] = useState(0);
 
   const {
     requestedMarkFavorite,
@@ -40,25 +52,22 @@ const QuizScreen = ({ route, navigation }) => {
   } = useSelector(selectQuiz);
 
   useEffect(() => {
-    setCurrentQuiz(route.params.quiz);
-    dispatch(markFavoritedInitialStateAction());
-    dispatch(unmarkFavoritedInitialStateAction());
+    dispatch(fetchQuizDetailsAction(route.params.quiz.id));
     dispatch(setCreateRoomInitialStateAction());
   }, [route]);
 
   useEffect(() => {
-    if (requestedMarkFavorite && (quiz && Object.keys(quiz).length > 0)) {
+    if (quiz && Object.keys(quiz).length > 0) {
       setCurrentQuiz(quiz);
-      dispatch(markFavoritedInitialStateAction());
     }
-  }, [requestedMarkFavorite, quiz]);
+  }, [quiz]);
 
   useEffect(() => {
-    if (requestedUnmarkFavorite && (quiz && Object.keys(quiz).length > 0)) {
-      setCurrentQuiz(quiz);
-      dispatch(unmarkFavoritedInitialStateAction());
+    if (currentQuiz && Object.keys(currentQuiz).length > 0) {
+      setIsFavoritedState(currentQuiz.is_favorited);
+      setFavoritedCountState(currentQuiz.favorited_count)
     }
-  }, [requestedUnmarkFavorite, quiz]);
+  }, [currentQuiz]);
 
   const goToPlayRoom = () => {
     dispatch(markPlayedAction({quizId: currentQuiz.id}));
@@ -68,10 +77,14 @@ const QuizScreen = ({ route, navigation }) => {
 
   const markFavorite = () => {
     dispatch(markFavoritedAction({quizId: currentQuiz.id}));
+    setIsFavoritedState(true);
+    setFavoritedCountState(favoritedCountState + 1);
   }
 
   const unmarkFavorite = () => {
     dispatch(unmarkFavoritedAction({quizId: currentQuiz.id}));
+    setIsFavoritedState(false);
+    setFavoritedCountState(favoritedCountState - 1);
   }
 
   const createRoom = () => {
@@ -80,8 +93,9 @@ const QuizScreen = ({ route, navigation }) => {
   }
 
   useEffect(() => {
-    console.log("createRoomCalled", createRoomCalled);
-    if (createRoomCalled === true && !creatingRoom && createdRoom && Object.keys(room).length > 0) {
+    if (createRoomCalled === true &&
+        !creatingRoom && createdRoom &&
+        Object.keys(room).length > 0) {
       navigation.navigate('JoiningRoom', { room: room })
     }
   }, [creatingRoom, createdRoom, room, createRoomCalled]);
@@ -92,12 +106,8 @@ const QuizScreen = ({ route, navigation }) => {
         <View style={styles.container}>
           <View style={styles.contentContainer}>
             <View style={styles.header}>
-              <TouchableOpacity style={styles.arrowIcon} onPress={() => { navigation.goBack(null) }}>
-                <Text style={styles.backButton}>X</Text>
-              </TouchableOpacity>
-
               <View style={styles.iconContainer}>
-                { currentQuiz.is_favorited ? (
+                { isFavoritedState ? (
                     <TouchableOpacity onPress={unmarkFavorite}>
                       <FilledStar color={"#35095c"} style={styles.icon} size={20} />
                     </TouchableOpacity>
@@ -108,6 +118,9 @@ const QuizScreen = ({ route, navigation }) => {
                   )
                 }
               </View>
+              <TouchableOpacity style={styles.arrowIcon} onPress={() => { navigation.goBack(null) }}>
+                <Text style={styles.backButton}>X</Text>
+              </TouchableOpacity>
             </View>
 
             <Image style={styles.bannerImage} source={{uri: currentQuiz.image_url}} />
@@ -126,12 +139,15 @@ const QuizScreen = ({ route, navigation }) => {
                 <Text style={styles.statsItemText}>Played</Text>
               </View>
               <View style={styles.statsItem}>
-                <Text style={styles.statsItemNumber}>{currentQuiz.favorited_count}</Text>
+                <Text style={styles.statsItemNumber}>{favoritedCountState}</Text>
                 <Text style={styles.statsItemText}>Favorited</Text>
               </View>
             </View>
 
-            <ScrollView contentContainerStyle={styles.descriptionAreaContainer} style={styles.descriptionArea} showsVerticalScrollIndicator={false}>
+            <ScrollView
+              contentContainerStyle={styles.descriptionAreaContainer}
+              style={styles.descriptionArea}
+              showsVerticalScrollIndicator={false}>
               <Text style={styles.descriptionHeading}>Description</Text>
 
               <Text style={styles.descriptionText}>
@@ -163,146 +179,127 @@ const QuizScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 30,
+    paddingHorizontal: 20,
     backgroundColor: '#fff',
   },
-
   contentContainer: {
-    justifyContent: 'start',
     alignItems: 'center',
-    paddingTop: 50,
     flex: 1,
   },
-
   header: {
     width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     marginTop: 10,
     marginBottom: 20,
     paddingHorizontal: 10,
   },
+  icon: {
+    marginVertical: 'auto',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
   backButton: {
     fontSize: 20,
-    // fontWeight: '900'
-  },
-  arrowIcon: {
-    // marginTop: 10,
-  },
-  title: {
-    fontSize: 30,
-  },
-  iconContainer: {
-    justifyContent: 'center',
-  },
-  icon: {
-    height: 30,
-    width: 30,
+    fontWeight: 'bold',
   },
 
   bannerImage: {
-    flex: 1,
     width: '100%',
-    minHeight: 200,
+    height: 200,
     resizeMode: 'cover',
     borderRadius: 20,
   },
-
   details: {
     width: '100%',
     paddingHorizontal: 10,
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     justifyContent: 'space-between',
     marginTop: 20,
   },
-
   text: {
     fontSize: 20,
-    // fontWeight: '600',
+    fontWeight: '600',
   },
-
   stats: {
     marginTop: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    padding: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 15,
     width: '100%',
-    borderColor: 'grey',
-    borderTopWidth: 0.3,
-    borderBottomWidth: 0.3
+    borderColor: '#ccc',
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
   },
-
   statsItem: {
     alignItems: 'center',
-    padding: 5
+  },
+  statsItemNumber: {
+    fontWeight: 'bold',
+    fontSize: 24,
   },
 
-  statsItemNumber: {
-    // fontWeight: '900',
-    fontSize: 25
+  statsItemText: {
+    fontSize: 14,
+    color: '#666',
   },
 
   descriptionArea: {
-    marginTop: 20
+    marginTop: 20,
+    paddingHorizontal: 15,
   },
 
   descriptionAreaContainer: {
-    alignItems: 'center'
+    alignItems: 'center',
   },
 
   descriptionHeading: {
-    fontSize: 30
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 10,
   },
 
   descriptionText: {
     textAlign: 'center',
-    paddingVertical: 10,
-    fontSize: 18,
-    lineHeight: 30,
-    letterSpacing: 1
+    fontSize: 16,
+    lineHeight: 24,
+    letterSpacing: 0.5,
   },
 
   footer: {
     width: '100%',
-    marginBottom: 20,
     flexDirection: 'row',
-    justifyContent: 'space-between'
+    justifyContent: 'center',
+    marginBottom: 20,
   },
 
   footerButton: {
-    width: '100%',
+    width: '90%',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 12,
+    paddingVertical: 15,
     borderRadius: 50,
-    // marginBottom: 20,
-    shadowColor: 'black',
+    shadowColor: '#000',
   },
 
   primaryButton: {
     backgroundColor: '#35095c',
   },
 
-  primaryButtonInvert: {
-    backgroundColor: '#ded5e6',
-  },
-
   primaryButtonText: {
-    fontSize: 14,
+    fontSize: 16,
+    fontWeight: 'bold',
     color: '#fff',
   },
 
-  primaryButtonInvertText: {
-    fontSize: 14,
-    color: '#35095c',
-  },
-
   buttonShadow: {
-    shadowColor: '#35095c',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
 });
 

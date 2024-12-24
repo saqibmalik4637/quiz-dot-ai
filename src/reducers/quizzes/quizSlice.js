@@ -16,7 +16,10 @@ export const quizSlice = createSlice({
     fetchedQuizzes: false,
     fetchError: '',
     quizzes: [],
-    quiz: {}
+    quiz: {},
+    isFavorited: false,
+    favoritedCount: 0,
+    fetchingQuizDetails: false,
   },
   reducers: {
     fetchQuizzes: (state, action) => {
@@ -26,8 +29,18 @@ export const quizSlice = createSlice({
       state.fetchedQuizzes = true
     },
 
-    markFavorited: (state, action) => {
+    fetchQuizDetails: (state, action) => {
       state.quiz = action.payload.quiz
+      state.fetchingQuizDetails = false
+    },
+
+    fetchQuizDetailsInitialState: (state, action) => {
+      state.fetchingQuizDetails = false
+    },
+
+    markFavorited: (state, action) => {
+      state.isFavorited = action.payload.quiz.is_favorited
+      state.favoritedCount = action.payload.quiz.favorited_count
       state.requestingMarkFavorite = false
       state.requestedMarkFavorite = true
       state.requestMarkFavoriteError = action.payload.error
@@ -40,7 +53,8 @@ export const quizSlice = createSlice({
     },
 
     unmarkFavorited: (state, action) => {
-      state.quiz = action.payload.quiz
+      state.isFavorited = action.payload.quiz.is_favorited
+      state.favoritedCount = action.payload.quiz.favorited_count
       state.requestingUnmarkFavorite = false
       state.requestedUnmarkFavorite = true
       state.requestUnmarkFavoriteError = action.payload.error
@@ -67,7 +81,9 @@ export const {
   markFavoritedInitialState,
   unmarkFavorited,
   unmarkFavoritedInitialState,
-  markPlayed
+  markPlayed,
+  fetchQuizDetails,
+  fetchQuizDetailsInitialState
 } = quizSlice.actions
 
 export const selectQuiz = (state) => state.quiz

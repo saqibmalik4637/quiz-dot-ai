@@ -1,49 +1,38 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Pressable, Text, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, View, Pressable, Text } from 'react-native';
 import PagerView from 'react-native-pager-view';
-
 import WelcomeSlide from '../components/WelcomeSlide';
 
 const WelcomeScreen = ({ navigation }) => {
   const slideContents = [
     {
-      text: 'Create, share and play quizzes whenever and wherever you want',
-      image: require('../../assets/slide-one.png')
+      text: 'Dive into exciting quizzes and explore your favorite topics!',
+      image: require('../../assets/slide-one.png'),
     },
-
     {
-      text: 'Find fun and interesting quizzes to boost up your knowledge',
-      image: require('../../assets/slide-two.png')
+      text: 'Test your knowledge across categories that spark your curiosity!',
+      image: require('../../assets/slide-two.png'),
     },
-
     {
-      text: 'Play and take quiz challenges together with your friends.',
-      image: require('../../assets/slide-three.png')
-    }
-  ]
-
-  const [currentSlide, setCurrentSlide] = useState(0);
+      text: "From science to cinema, there's a quiz here just for you!",
+      image: require('../../assets/slide-three.png'),
+    },
+  ];
 
   return (
     <View style={styles.container}>
       <PagerView style={styles.swiper} initialPage={0}>
-        { 
-          slideContents.map((slideData, i) => {
-            return <WelcomeSlide key={i} text={slideData.text} image={slideData.image} currentIndex={i} />
-          })
-        }
+        {slideContents.map((slideData, i) => (
+          <WelcomeSlide key={i} text={slideData.text} image={slideData.image} currentIndex={i} />
+        ))}
       </PagerView>
-
       <View style={styles.buttonsView}>
         <Pressable
           style={[styles.primaryButton, styles.buttonShadow]}
-          onPress={() => navigation.navigate('Signup')}>
+          onPress={() => navigation.navigate('Signup')}
+        >
           <Text style={styles.primaryButtonText}>GET STARTED</Text>
         </Pressable>
-
-        {/*<Pressable style={[styles.primaryButtonInvert, styles.buttonShadow]} onPress={() => Alert.alert('I ALREADY HAVE AN ACCOUNT')}>*/}
-          {/*<Text style={styles.primaryButtonInvertText}>I ALREADY HAVE AN ACCOUNT</Text>*/}
-        {/*</Pressable>*/}
       </View>
     </View>
   );
@@ -51,22 +40,17 @@ const WelcomeScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 30,
-    paddingVertical: 50,
     flex: 1,
     backgroundColor: '#fff',
   },
-
   swiper: {
     flex: 1,
   },
-
   buttonsView: {
-    marginTop: 100,
-    marginBottom: 50,
+    paddingHorizontal: 30,
+    paddingBottom: 20,
     width: '100%',
   },
-
   primaryButton: {
     backgroundColor: '#35095c',
     width: '100%',
@@ -74,36 +58,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 20,
     borderRadius: 50,
-    marginBottom: 20,
-    shadowColor: 'black',
   },
-
-  primaryButtonInvert: {
-    backgroundColor: '#ded5e6',
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 20,
-    borderRadius: 50,
-    shadowColor: 'black',
-  },
-
   primaryButtonText: {
     fontSize: 16,
-    lineHeight: 21,
     fontWeight: 'bold',
     letterSpacing: 0.25,
     color: '#fff',
   },
-
-  primaryButtonInvertText: {
-    fontSize: 16,
-    lineHeight: 21,
-    fontWeight: 'bold',
-    letterSpacing: 0.25,
-    color: '#35095c',
-  },
-
   buttonShadow: {
     shadowColor: '#35095c',
     shadowOffset: { width: 0, height: 4 },

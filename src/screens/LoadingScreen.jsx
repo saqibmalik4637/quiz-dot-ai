@@ -47,7 +47,7 @@ const LoadingScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Image style={styles.logo} source={require('../../assets/logo.png')} />
+      <Image style={styles.logo} source={require('../../assets/loading-logo.gif')} />
     </View>
   );
 };
@@ -58,6 +58,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  logo: {
+    resizeMode: 'contain',
+    width: '100%'
   }
 });
 

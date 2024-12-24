@@ -69,8 +69,8 @@ const SearchResultScreen = ({ route, navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 30,
-    paddingVertical: 50,
+    paddingHorizontal: 20,
+    // paddingVertical: 50,
     flex: 1,
     backgroundColor: '#fff',
   },

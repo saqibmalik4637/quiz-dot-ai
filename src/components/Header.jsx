@@ -17,7 +17,7 @@ const Header = ({ navigation, title }) => {
 
       <View style={styles.iconContainer}>
         <TouchableOpacity onPress={() => navigation.navigate('Search')}>
-          <EvilIcons name="search" color="#35095c" style={styles.icon} size={24} />
+          <AntDesign name="search1" color="#35095c" style={styles.icon} size={24} />
         </TouchableOpacity>
       </View>
     </View>
@@ -34,19 +34,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     paddingHorizontal: 10,
   },
-  arrowIcon: {
-    marginTop: 10,
-  },
   title: {
     fontSize: 24,
   },
   iconContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  icon: {
-    // height: 30,
-    // width: 30,
   },
 });
 

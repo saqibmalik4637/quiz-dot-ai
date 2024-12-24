@@ -142,6 +142,7 @@ const PlayRoomScreen = ({ route, navigation }) => {
   }, [timeTaken]);
 
   useEffect(() => {
+    console.log("UserAnswer")
     if (userAnswer) {
       setStopTimer(true);
 
@@ -171,7 +172,7 @@ const PlayRoomScreen = ({ route, navigation }) => {
 
       setAllAnswers(
         [
-          ...allAnswers, 
+          ...allAnswers,
           {
             question: currentQuestion,
             user_answer: userAnswer,
@@ -206,7 +207,19 @@ const PlayRoomScreen = ({ route, navigation }) => {
         <>
           <View style={styles.header}>
             <Text style={styles.questionsCount}>{questionIndex + 1}/{quiz.questions_count}</Text>
-            <Text style={styles.quizName}>Quiz</Text>
+            <View style={styles.progressBar}>
+              <Progress.Bar
+                progress={timeProgress}
+                height={14}
+                borderRadius={50}
+                color={ timeOver ? '#cf3636' : '#35095c' }
+                borderWidth={0}
+                unfilledColor={"#ded5e6"}
+                style={styles.progress}
+                animated={true}
+                animationType="timing"
+              />
+            </View>
             <View style={styles.iconContainer}>
               <TouchableOpacity onPress={() => { navigation.goBack(null) }}>
                 <Text style={styles.backButton}>X</Text>
@@ -217,13 +230,6 @@ const PlayRoomScreen = ({ route, navigation }) => {
           { currentQuestion &&
             <View style={styles.questionFullScreen}>
               <View style={styles.question}>
-                <View style={styles.progressBar}>
-                  <View style={styles.bar}>
-                    <Progress.Bar progress={timeProgress} height={14} borderRadius={50} width={null} color={ timeOver ? '#cf3636' : '#35095c' }
-                                  borderWidth={0} unfilledColor={"#ded5e6"} style={styles.progress} animated={false} animationType="timing" />
-                  </View>
-                </View>
-
                 <View style={styles.questionContainer}>
                   <Text style={styles.questionContent}>{currentQuestion.content}</Text>
                 </View>
@@ -270,7 +276,7 @@ const PlayRoomScreen = ({ route, navigation }) => {
                       )
                     }) }
 
-                    { result ? 
+                    { result ?
                       <Pressable
                         style={[styles.primaryButton, styles.buttonShadow]}
                         onPress={() => nextQuestion()}>
@@ -296,7 +302,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 30,
     backgroundColor: '#fff',
-    paddingTop: 50,
+    // paddingTop: 50,
   },
 
   header: {
@@ -339,14 +345,7 @@ const styles = StyleSheet.create({
   },
 
   progressBar: {
-    fontSize: 30,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-
-  bar: {
-    width: '100%'
+    marginVertical: 10,
   },
 
   progressCount: {
@@ -355,7 +354,7 @@ const styles = StyleSheet.create({
 
   questionFullScreen: {
     height: '85%',
-    justifyContent: 'space-between',    
+    justifyContent: 'space-between',
   },
 
   question: {
@@ -374,11 +373,6 @@ const styles = StyleSheet.create({
 
   questionContent: {
     fontSize: 20
-  },
-
-  optionsContainer: {
-    // height: 'auto',
-    // justifyContent: 'space-between'
   },
 
   optionItemContainer: {

@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, ScrollView, View, TextInput, Pressable, Alert, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, ScrollView, View, TextInput, Pressable, Alert } from 'react-native';
 import { useSelector, useDispatch } from "react-redux";
-
-import {CountryPicker} from "react-native-country-codes-picker";
 
 import { fetchCurrentUserAction, createUserAction } from '../reducers/users/userAction';
 import { selectCurrentUser, selectFetchedCurrentUser, selectUserToken } from '../reducers/users/userSlice';
-
 import { fetchCarouselsAction } from '../reducers/carousels/carouselAction';
 import { selectCarousels } from '../reducers/carousels/carouselSlice';
 
@@ -18,13 +15,11 @@ const SignupScreen = ({ navigation }) => {
   const currentUser = useSelector(selectCurrentUser);
   const fetchedCurrentUser = useSelector(selectFetchedCurrentUser);
   const carousels = useSelector(selectCarousels);
+  
   const [tokenStored, setTokenStored] = useState(false);
   const [fullname, setFullname] = useState('');
   const [age, setAge] = useState('');
-  const [countryCode, setCountryCode] = useState('');
-  const [countryName, setCountryName] = useState('');
-  const [showCountryPicker, setShowCountryPicker] = useState(false);
-
+  
   const _storeToken = async (token) => {
     try {
       await AsyncStorage.setItem('token', token);
@@ -35,15 +30,14 @@ const SignupScreen = ({ navigation }) => {
 
   const redirectToHome = () => {
     navigation.navigate('Home');
-  }
+  };
 
   const handleSubmit = () => {
     dispatch(createUserAction({
       fullname: fullname,
       age: age,
-      country_code: countryCode
     }));
-  }
+  };
 
   useEffect(() => {
     if (userToken) {
@@ -65,75 +59,54 @@ const SignupScreen = ({ navigation }) => {
   }, [fetchedCurrentUser, currentUser]);
 
   useEffect(() => {
-    if (carousels && (carousels.length > 0)) {
+    if (carousels && carousels.length > 0) {
       navigation.navigate('Home');
     }
   }, [carousels]);
 
   return (
-    <View  style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.screenIntro}>
         <View style={styles.screenTitle}>
-          <Text style={styles.screenTitle.text}>CREATE AN ACCOUNT</Text>
+          <Text style={styles.screenTitleText}>Create Your Account</Text>
         </View>
 
         <View style={styles.screenDescription}>
-          {/*<Text style={styles.screenDescription.text}>Unlock the treasure trove of quizzes tailored just for you! Share a sprinkle of your details, and we'll conjure up the perfect quiz potion for your entertainment delight. Let's get started on this adventure together! 🚀✨</Text>*/}
+          <Text style={styles.screenDescriptionText}>
+            Share a little about yourself, and let’s get you started on an exciting quiz adventure!
+          </Text>
         </View>
       </View>
 
-      <ScrollView contentContainerStyle={{flex: 1}} style={styles.screenForm}>
+      <ScrollView contentContainerStyle={styles.screenForm}>
         <View style={styles.formFields}>
           <View style={styles.inputGroup}>
-            <Text style={styles.screenForm.text}>Name</Text>
-
+            <Text style={styles.inputLabel}>Full Name</Text>
             <TextInput
               style={styles.textInput}
               onChangeText={setFullname}
               value={fullname}
+              placeholder="Enter your name"
+              placeholderTextColor="#888"
             />
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.screenForm.text}>Age</Text>
-
+            <Text style={styles.inputLabel}>Age</Text>
             <TextInput
               style={styles.textInput}
               onChangeText={setAge}
               value={age}
               keyboardType="numeric"
+              placeholder="Enter your age"
+              placeholderTextColor="#888"
             />
           </View>
-
-          {/*<View style={styles.inputGroup}>
-            <Text style={styles.screenForm.text}>Country</Text>
-
-            <TouchableOpacity
-              onPress={() => setShowCountryPicker(true)}
-              style={styles.textInput}
-            >
-              <Text style={{fontSize: 18}}>
-                {countryName}
-              </Text>
-            </TouchableOpacity>
-
-            <CountryPicker
-              style={{paddingTop: 50}}
-              show={showCountryPicker}
-              // when picker button press you will get the country object with dial code
-              pickerButtonOnPress={(item) => {
-                setCountryCode(item.code);
-                setCountryName(item.name.en);
-                setShowCountryPicker(false);
-              }}
-              popularCountries={['en', 'in', 'us']}
-            />
-          </View>*/}
 
           <Pressable
             style={[styles.primaryButton, styles.buttonShadow]}
             onPress={handleSubmit}>
-            <Text style={styles.primaryButtonText}>Let's play</Text>
+            <Text style={styles.primaryButtonText}>Let's Play</Text>
           </Pressable>
         </View>
       </ScrollView>
@@ -143,56 +116,74 @@ const SignupScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 30,
-    paddingVertical: 50,
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
-    justifyContent: 'start',
+    justifyContent: 'flex-start',
+    paddingHorizontal: 30,
+    paddingVertical: 40,
   },
 
   screenIntro: {
-    marginTop: 50,
-  },
-
-  screenForm: {
-    marginTop: 50,
-    width: '100%',
-  },
-
-  formFields: {
-    marginBottom: 100,
-    gap: 20,
+    marginTop: 20,
+    alignItems: 'center',
   },
 
   screenTitle: {
-    alignItems: 'center',
+    marginBottom: 10,
+  },
 
-    text: {
-      fontSize: 30,
-    }
+  screenTitleText: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#35095c',
+    textAlign: 'center',
   },
 
   screenDescription: {
-    paddingTop: 40,
-    padding: 10,
+    paddingTop: 20,
+    paddingBottom: 20,
     alignItems: 'center',
+  },
 
-    text: {
-      fontSize: 18,
-      lineHeight: 25,
-      letterSpacing: 1,
-      textAlign: 'center',
-    }
+  screenDescriptionText: {
+    fontSize: 16,
+    lineHeight: 22,
+    textAlign: 'center',
+    color: '#666',
+    letterSpacing: 0.5,
+  },
+
+  screenForm: {
+    flex: 1,
+    paddingBottom: 40,
+  },
+
+  formFields: {
+    width: '100%',
+    gap: 20,
+  },
+
+  inputGroup: {
+    width: '100%',
+  },
+
+  inputLabel: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#35095c',
+    marginBottom: 8,
   },
 
   textInput: {
     fontSize: 18,
-    height: 40,
+    height: 50,
     width: '100%',
     borderBottomWidth: 1,
     borderBottomColor: '#35095c',
-    justifyContent: 'center'
+    paddingHorizontal: 10,
+    marginBottom: 20,
+    color: '#000',
   },
 
   primaryButton: {
@@ -200,17 +191,14 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 20,
+    paddingVertical: 18,
     borderRadius: 50,
-    marginBottom: 20,
-    shadowColor: 'black',
+    marginTop: 20,
   },
 
   primaryButtonText: {
-    fontSize: 16,
-    lineHeight: 21,
+    fontSize: 18,
     fontWeight: 'bold',
-    letterSpacing: 0.25,
     color: '#fff',
   },
 
@@ -218,7 +206,7 @@ const styles = StyleSheet.create({
     shadowColor: '#35095c',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
-    shadowRadius: 2,
+    shadowRadius: 5,
   },
 });
 
