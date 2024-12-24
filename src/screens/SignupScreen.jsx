@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, ScrollView, View, TextInput, Pressable, Alert } from 'react-native';
+import { StyleSheet, Text, ScrollView, View, TextInput, Pressable, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { useSelector, useDispatch } from "react-redux";
 
 import { fetchCurrentUserAction, createUserAction } from '../reducers/users/userAction';
@@ -15,11 +15,11 @@ const SignupScreen = ({ navigation }) => {
   const currentUser = useSelector(selectCurrentUser);
   const fetchedCurrentUser = useSelector(selectFetchedCurrentUser);
   const carousels = useSelector(selectCarousels);
-  
+
   const [tokenStored, setTokenStored] = useState(false);
   const [fullname, setFullname] = useState('');
   const [age, setAge] = useState('');
-  
+
   const _storeToken = async (token) => {
     try {
       await AsyncStorage.setItem('token', token);
@@ -65,20 +65,28 @@ const SignupScreen = ({ navigation }) => {
   }, [carousels]);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.screenIntro}>
-        <View style={styles.screenTitle}>
-          <Text style={styles.screenTitleText}>Create Your Account</Text>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={100} // Adjust as per your header height
+    >
+      <ScrollView
+        contentContainerStyle={styles.screenForm}
+        keyboardShouldPersistTaps="always"
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.screenIntro}>
+          <View style={styles.screenTitle}>
+            <Text style={styles.screenTitleText}>Create Your Account</Text>
+          </View>
+
+          <View style={styles.screenDescription}>
+            <Text style={styles.screenDescriptionText}>
+              Share a little about yourself, and let’s get you started on an exciting quiz adventure!
+            </Text>
+          </View>
         </View>
 
-        <View style={styles.screenDescription}>
-          <Text style={styles.screenDescriptionText}>
-            Share a little about yourself, and let’s get you started on an exciting quiz adventure!
-          </Text>
-        </View>
-      </View>
-
-      <ScrollView contentContainerStyle={styles.screenForm}>
         <View style={styles.formFields}>
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>Full Name</Text>
@@ -110,7 +118,7 @@ const SignupScreen = ({ navigation }) => {
           </Pressable>
         </View>
       </ScrollView>
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -118,10 +126,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    paddingHorizontal: 30,
-    paddingVertical: 40,
+    paddingHorizontal: 20,
+    paddingTop: 40,
   },
 
   screenIntro: {
@@ -155,7 +161,7 @@ const styles = StyleSheet.create({
   },
 
   screenForm: {
-    flex: 1,
+    flexGrow: 1,
     paddingBottom: 40,
   },
 
