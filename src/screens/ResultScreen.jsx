@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react';
-import { Dimensions, StyleSheet, View, Text, ScrollView, Pressable } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Dimensions, StyleSheet, View, Text, ScrollView, Pressable, BackHandler } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useFocusEffect } from '@react-navigation/native';
 
 // import io from 'socket.io-client';
 
@@ -7,15 +9,13 @@ import { useSelector, useDispatch } from 'react-redux';
 import QuizzesList from '../components/QuizzesList';
 
 import { createReportCardReportCardInitialStateAction } from '../reducers/report_cards/reportCardAction';
-import { getRoomScorebordAction } from '../reducers/rooms/roomAction';
+import { getRoomScoreboardAction } from '../reducers/rooms/roomAction';
 import { selectRoom } from '../reducers/rooms/roomSlice';
 
 import { useInterstitialAd, TestIds } from 'react-native-google-mobile-ads';
 
 const ResultScreen = ({ route, navigation }) => {
   // const socket = io('https://golden-vast-mongoose.ngrok-free.app');
-
-  const { isLoaded, isClosed, load, show } = useInterstitialAd("ca-app-pub-3081698164560598/7924515371");
 
   const dispatch = useDispatch();
 
@@ -24,39 +24,36 @@ const ResultScreen = ({ route, navigation }) => {
   const screenWidth = Dimensions.get("window").width;
 
   const [reportCard, setReportCard] = useState(null);
-  const [grapghData, setGraphData] = useState([]);
-  const [adWatched, setAdWatched] = useState(false);
+  const [graphData, setGraphData] = useState([]);
   const [room, setRoom] = useState(null);
   const [roomScoreboard, setRoomScoreboard] = useState([]);
 
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+        navigation.navigate('Home');
+        return true; // Prevents going back
+      };
+
+      // Listen for the back button press on Android
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+      // Cleanup on screen unmount
+      return () => {
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+      };
+    }, [])
+  );
+
   useEffect(() => {
     dispatch(createReportCardReportCardInitialStateAction());
-    setAdWatched(false);
-    load();
+    setReportCard(route.params.reportCard);
     // setRoom(route.params.room);
-  }, [route, load]);
-
-  useEffect(() => {
-    if (isLoaded && !adWatched) {
-      show();
-    }
-  }, [isLoaded, show]);
-
-  useEffect(() => {
-    if (isClosed) {
-      setAdWatched(true);
-    }
-  }, [isClosed]);
-
-  useEffect(() => {
-    if (adWatched) {
-      setReportCard(route.params.reportCard);
-    }
-  }, [adWatched]);
+  }, [route]);
 
   useEffect(() => {
     if (room && room) {
-      dispatch(getRoomScorebordAction(room.id));
+      dispatch(getRoomScoreboardAction(room.id));
 
       socket.on(`refresh-scoreboard-${room.id}`, (data) => {
         setRoomScoreboard(data.scoreboard);
@@ -72,79 +69,260 @@ const ResultScreen = ({ route, navigation }) => {
 
   return (
     <View style={styles.container} showsVerticalScrollIndicator={false}>
-      <View style={styles.header}>
-        <Text style={styles.headerText}>FINAL SCOREBOARD</Text>
-      </View>
+      <LinearGradient
+        colors={['#FFD700', '#FF8C00']} // Define gradient colors here
+        style={styles.headerGradient}
+      >
+        <View style={styles.header}>
+          <Text style={styles.headerText}>FINAL SCOREBOARD</Text>
+        </View>
 
-      { (reportCard && Object.keys(reportCard).length > 0) &&
-        <ScrollView style={styles.resultContainerParent} showsVerticalScrollIndicator={false}>
-          <View style={styles.totalScore}>
-            <Text style={styles.totalNumber}>{parseFloat(reportCard.score).toFixed(2)}</Text>
-          </View>
+        { (reportCard && Object.keys(reportCard).length > 0) &&
+          <ScrollView style={[styles.resultContainerParent, { marginBottom: 80 }]} showsVerticalScrollIndicator={false}>
+            <View style={styles.scoreContainer}>
+              <View style={styles.totalScore}>
+                <Text style={styles.totalNumberText}>SCORED POINTS</Text>
+                <Text style={styles.totalNumber}>{parseFloat(reportCard.score).toFixed(2)}</Text>
+              </View>
 
-          <View style={styles.scoreContainer}>
-            <View style={styles.numbersContainer}>
-              <Text style={styles.correctAnswerNumber}>{reportCard.correct_count}</Text>
-              <Text style={styles.correctAnswerText}>correct</Text>
-            </View>
+              <View style={styles.numbersContainer}>
+                <Text style={styles.correctAnswerText}>CORRECT</Text>
+                <Text style={styles.correctAnswerNumber}>{reportCard.correct_count}</Text>
+              </View>
 
-            <View style={styles.numbersContainer}>
-              <Text style={styles.timedOutNumber}>{reportCard.no_result_count}</Text>
-              <Text style={styles.timedOutText}>timed out</Text>
-            </View>
+              <View style={styles.numbersContainer}>
+                <Text style={styles.timedOutText}>TIMED OUT</Text>
+                <Text style={styles.timedOutNumber}>{reportCard.no_result_count}</Text>
+              </View>
 
-            <View style={styles.numbersContainer}>
-              <Text style={styles.inCorrectAnswerNumber}>{reportCard.incorrect_count}</Text>
-              <Text style={styles.inCorrectAnswerText}>incorrect</Text>
-            </View>
-          </View>
-
-          { (room && room) &&
-            <View style={styles.otherUsersContainer}>
-              <Text style={styles.headerText}>ALL USERS</Text>
-
-              <View style={styles.allUsersList} showsVerticalScrollIndicator={false}>
-                { roomScoreboard &&
-                  <>
-                  { roomScoreboard.map((userItem, i) => {
-                    return <View key={i} style={styles.userItem}>
-                      <View style={styles.userItemInnerContainer}>
-                        <Text style={styles.userPosition}>{userItem.position}.</Text>
-                        <Text style={styles.userName}>{userItem.name}</Text>
-                      </View>
-
-                      <View style={styles.userItemInnerContainer}>
-                        { (userItem.in_progress && userItem.in_progress === true) ? (
-                            <Text style={styles.userScoreText}>In progress</Text>
-                          ) : (<Text style={styles.userScore}>{parseFloat(userItem.score).toFixed(2)}</Text>)
-                        }
-                      </View>
-                    </View>
-                  }) }
-                  </>
-                }
+              <View style={styles.numbersContainer}>
+                <Text style={styles.inCorrectAnswerText}>INCORRECT</Text>
+                <Text style={styles.inCorrectAnswerNumber}>{reportCard.incorrect_count}</Text>
               </View>
             </View>
-          }
 
-          <View style={styles.footerButton}>
-            <Pressable style={[styles.primaryButtonInvert, styles.buttonShadow]} onPress={() => navigation.navigate('Home')}>
-              <Text style={styles.primaryButtonInvertText}>GO TO HOME</Text>
-            </Pressable>
-          </View>
+            { (room && room) &&
+              <View style={styles.otherUsersContainer}>
+                <Text style={styles.headerText}>ALL USERS</Text>
 
-          <View style={styles.moreItems}>
-            <Text style={styles.moreItemHeading}>SIMILAR QUIZZES:</Text>
+                <View style={styles.allUsersList} showsVerticalScrollIndicator={false}>
+                  { roomScoreboard &&
+                    <>
+                    { roomScoreboard.map((userItem, i) => {
+                      return <View key={i} style={styles.userItem}>
+                        <View style={styles.userItemInnerContainer}>
+                          <Text style={styles.userPosition}>{userItem.position}.</Text>
+                          <Text style={styles.userName}>{userItem.name}</Text>
+                        </View>
 
-            <QuizzesList navigation={navigation} query={reportCard.quiz_category_name} />
-          </View>
-        </ScrollView>
-      }
+                        <View style={styles.userItemInnerContainer}>
+                          { (userItem.in_progress && userItem.in_progress === true) ? (
+                              <Text style={styles.userScoreText}>In progress</Text>
+                            ) : (<Text style={styles.userScore}>{parseFloat(userItem.score).toFixed(2)}</Text>)
+                          }
+                        </View>
+                      </View>
+                    }) }
+                    </>
+                  }
+                </View>
+              </View>
+            }
+          </ScrollView>
+        }
+        <View style={styles.footerButton}>
+          <Pressable style={[styles.primaryButton, styles.buttonShadow]} onPress={() => navigation.navigate('Home')}>
+            <Text style={styles.primaryButtonText}>GO TO HOME</Text>
+          </Pressable>
+        </View>
+      </LinearGradient>
     </View>
   )
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+  },
+
+  headerGradient: {
+    width: '100%',
+  },
+
+  header: {
+    paddingTop: 50,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  headerText: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: "#35095c"
+  },
+
+  resultContainerParent: {
+    width: '100%',
+    height: '80%',
+  },
+
+  resultContainer: {
+    marginTop: 30,
+    width: '100%',
+  },
+
+  scoreContainer: {
+    marginTop: 40,
+    marginHorizontal: 25,
+    justifyContent: 'space-evenly',
+    backgroundColor: '#f9f5ff',
+    borderRadius: 25,
+    paddingHorizontal: 30,
+    paddingVertical: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 8, // For Android shadow
+  },
+
+  numbersContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginVertical: 15,
+    padding: 10,
+    backgroundColor: '#ece8f5',
+    borderRadius: 20,
+  },
+
+  correctAnswerNumber: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#4caf50',
+    textAlign: 'center',
+  },
+
+  correctAnswerText: {
+    fontSize: 18,
+    color: '#4caf50',
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+
+  inCorrectAnswerNumber: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#f44336',
+    textAlign: 'center',
+  },
+
+  inCorrectAnswerText: {
+    fontSize: 18,
+    color: '#f44336',
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+
+  timedOutNumber: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#ff9800',
+    textAlign: 'center',
+  },
+
+  timedOutText: {
+    fontSize: 18,
+    color: '#ff9800',
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+
+  totalScore: {
+    marginHorizontal: 50,
+    alignItems: 'center',
+  },
+
+  totalNumber: {
+    fontSize: 50,
+    color: '#35095c'
+  },
+
+  totalText: {
+    fontSize: 20,
+    color: '#ded5e6'
+  },
+
+  buttonShadow: {
+    shadowColor: '#35095c',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    elevation: 8,
+  },
+
+  primaryButtonInvertText: {
+    fontSize: 16,
+    lineHeight: 21,
+    fontWeight: 'bold',
+    letterSpacing: 0.25,
+    color: '#35095c',
+  },
+
+  primaryButtonText: {
+    fontSize: 16,
+    lineHeight: 21,
+    fontWeight: 'bold',
+    letterSpacing: 0.25,
+    color: '#ded5e6',
+  },
+
+  primaryButton: {
+    marginTop: 100,
+    backgroundColor: '#35095c',
+    width: '80%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 20,
+    borderRadius: 50,
+    shadowColor: 'black',
+  },
+
+  primaryButtonInvert: {
+    marginTop: 100,
+    backgroundColor: '#ded5e6',
+    width: '80%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 20,
+    borderRadius: 50,
+    shadowColor: 'black',
+  },
+
+  footerButton: {
+    width: '100%',
+    alignItems: 'center',
+    position: 'absolute',
+    right: 0,
+    left: 0,
+    bottom: 20,
+    zIndex: 10,
+  },
+
+  moreItems: {
+    marginTop: 30,
+    marginHorizontal: 20
+  },
+
+  moreItemHeading: {
+    fontSize: 30,
+    color: '#ded5e6'
+  },
+
   otherUsersContainer: {
     marginTop: 20,
     alignItems: 'center',
@@ -185,139 +363,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#ded5e6'
   },
-
-  container: {
-    flex: 1,
-    justifyContent: 'start',
-    alignItems: 'center',
-  },
-
-  header: {
-    height: '20%',
-    width: '100%',
-    paddingTop: 50,
-    backgroundColor: '#35095c',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-
-  headerText: {
-    fontSize: 30,
-    color: "#ded5e6"
-  },
-
-  resultContainerParent: {
-    width: '100%',
-    backgroundColor: '#35095c'
-  },
-
-  resultContainer: {
-    marginTop: 30,
-    width: '100%',
-  },
-
-  scoreContainer: {
-    marginTop: 50,
-    marginHorizontal: 50,
-    flexDirection: 'row',
-    justifyContent: 'space-between'
-  },
-
-  numbersContainer: {
-    alignItems: 'center'
-  },
-
-  correctAnswerNumber: {
-    fontSize: 60,
-    color: '#128230',
-  },
-
-  correctAnswerText: {
-    fontSize: 20,
-    color: '#128230',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-
-  inCorrectAnswerNumber: {
-    fontSize: 60,
-    color: '#cf3636',
-  },
-
-  inCorrectAnswerText: {
-    fontSize: 20,
-    color: '#cf3636',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-
-  timedOutNumber: {
-    fontSize: 60,
-    color: '#b6c7e3',
-  },
-
-  timedOutText: {
-    fontSize: 20,
-    color: '#b6c7e3',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-
-  totalScore: {
-    marginHorizontal: 50,
-    alignItems: 'center',
-  },
-
-  totalNumber: {
-    fontSize: 80,
-    color: '#ded5e6'
-  },
-
-  totalText: {
-    fontSize: 20,
-    color: '#ded5e6'
-  },
-
-  buttonShadow: {
-    shadowColor: '#35095c',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
-  },
-
-  primaryButtonInvertText: {
-    fontSize: 16,
-    lineHeight: 21,
-    fontWeight: 'bold',
-    letterSpacing: 0.25,
-    color: '#35095c',
-  },
-
-  primaryButtonInvert: {
-    marginTop: 100,
-    backgroundColor: '#ded5e6',
-    width: '80%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 20,
-    borderRadius: 50,
-    shadowColor: 'black',
-  },
-
-  footerButton: {
-    width: '100%',
-    alignItems: 'center'
-  },
-
-  moreItems: {
-    marginTop: 30,
-    marginHorizontal: 20
-  },
-
-  moreItemHeading: {
-    fontSize: 30,
-    color: '#ded5e6'
-  }
 });
 
 export default ResultScreen;

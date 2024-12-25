@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, ScrollView, View, TextInput, Pressable, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+
+import {
+  StyleSheet, Text, ScrollView, View, TextInput, Pressable,
+  Alert, KeyboardAvoidingView, Platform
+} from 'react-native';
+
 import { useSelector, useDispatch } from "react-redux";
 
 import { fetchCurrentUserAction, createUserAction } from '../reducers/users/userAction';
@@ -213,6 +218,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 5,
+    elevation: 8,
   },
 });
 

@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   buttonsView: {
-    paddingHorizontal: 30,
+    paddingHorizontal: 20,
     paddingBottom: 20,
     width: '100%',
   },
@@ -70,6 +70,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 2,
+    elevation: 8,
   },
 });
 

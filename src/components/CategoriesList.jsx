@@ -65,6 +65,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 2,
     backgroundColor: '#35095c',
+    elevation: 8,
   },
 
   imageInner: {

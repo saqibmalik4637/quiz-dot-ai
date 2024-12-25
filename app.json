@@ -22,7 +22,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.saqibmalik.starquiz",
-      "versionCode": 6
+      "versionCode": 7
     },
     "web": {
       "favicon": "./assets/favicon.png"

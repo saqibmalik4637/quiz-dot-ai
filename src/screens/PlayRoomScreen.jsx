@@ -12,8 +12,10 @@ import { createReportCardAction, createReportCardReportCardInitialStateAction } 
 import { selectReportCard } from '../reducers/report_cards/reportCardSlice';
 
 import * as Progress from 'react-native-progress';
+import { useInterstitialAd, TestIds } from 'react-native-google-mobile-ads';
 
 const PlayRoomScreen = ({ route, navigation }) => {
+  const { isLoaded, isClosed, load, show, error } = useInterstitialAd("ca-app-pub-3081698164560598/7924515371");
   const totalTime = 20 * 1000;
 
   const dispatch = useDispatch();
@@ -79,13 +81,20 @@ const PlayRoomScreen = ({ route, navigation }) => {
   }
 
   useEffect(() => {
+    if (error) {
+      console.error("Interstitial Ad Error: ", error);
+    }
+  }, [error]);
+
+  useEffect(() => {
     dispatch(createReportCardReportCardInitialStateAction());
     setQuiz(route.params.quiz);
+    load();
 
     if (route.params.room) {
       setRoom(route.params.room);
     }
-  }, [route]);
+  }, [route, load]);
 
   useEffect(() => {
     if (quiz && Object.keys(quiz).length > 0) {
@@ -113,7 +122,7 @@ const PlayRoomScreen = ({ route, navigation }) => {
 
   useEffect(() => {
     if (runTimer && !timeTakenTracker) {
-      setTimeTakenTracker(setTimeout(() => { setTimeTaken(timeTaken + 10) }, 10));
+      setTimeTakenTracker(setTimeout(() => { setTimeTaken(timeTaken + 1000) }, 1000));
     }
   }, [runTimer]);
 
@@ -122,7 +131,7 @@ const PlayRoomScreen = ({ route, navigation }) => {
       clearInterval(timeTakenTracker);
       setTimeTakenTracker(null);
     }
-  }, [stopTimer]);
+  }, [stopTimer, timeTakenTracker, setTimeTakenTracker, clearInterval]);
 
   useEffect(() => {
     if (timeTaken > 0) {
@@ -133,7 +142,7 @@ const PlayRoomScreen = ({ route, navigation }) => {
       setTimeTakenTracker(null);
 
       if (timeTaken < totalTime) {
-        setTimeTakenTracker(setTimeout(() => { setTimeTaken(timeTaken + 100) }, 100));
+        setTimeTakenTracker(setTimeout(() => { setTimeTaken(timeTaken + 1000) }, 1000));
       } else {
         setStopTimer(true);
         setTimeOver(true);
@@ -142,7 +151,6 @@ const PlayRoomScreen = ({ route, navigation }) => {
   }, [timeTaken]);
 
   useEffect(() => {
-    console.log("UserAnswer")
     if (userAnswer) {
       setStopTimer(true);
 
@@ -190,16 +198,18 @@ const PlayRoomScreen = ({ route, navigation }) => {
   }, [result]);
 
   useEffect(() => {
-    if (finalResult && Object.keys(finalResult).length > 0) {
+    console.log("isLoaded", isLoaded)
+    if (finalResult && Object.keys(finalResult).length > 0 && isLoaded) {
       createReportCard();
+      show();
     }
-  }, [finalResult]);
+  }, [finalResult, isLoaded, show]);
 
   useEffect(() => {
-    if (!creatingReportCard && createdReportCard && (reportCard && Object.keys(reportCard).length > 0)) {
+    if (isClosed && !creatingReportCard && createdReportCard && (reportCard && Object.keys(reportCard).length > 0)) {
       navigation.navigate('Result', { reportCard: reportCard, room: room });
     }
-  }, [reportCard, creatingReportCard, createdReportCard]);
+  }, [reportCard, creatingReportCard, createdReportCard, isClosed]);
 
   return (
     <View style={styles.container}>
@@ -275,19 +285,20 @@ const PlayRoomScreen = ({ route, navigation }) => {
                         </View>
                       )
                     }) }
-
-                    { result ?
-                      <Pressable
-                        style={[styles.primaryButton, styles.buttonShadow]}
-                        onPress={() => nextQuestion()}>
-                        <Text style={styles.primaryButtonText}>{ questionIndex + 1 < questions.length ? 'NEXT' : 'SEE REPORT CARD' }</Text>
-                      </Pressable>
-                    : <Pressable style={[styles.primaryButtonInvert, styles.buttonShadow]}>
-                        <Text style={styles.primaryButtonInvertText}>{ questionIndex + 1 < questions.length ? 'NEXT' : 'SEE REPORT CARD' }</Text>
-                      </Pressable>
-                    }
                   </ScrollView>
                 </View>
+              </View>
+              <View style={styles.fixedNextButton}>
+                { result ?
+                  <Pressable
+                    style={[styles.primaryButton, styles.buttonShadow]}
+                    onPress={() => nextQuestion()}>
+                    <Text style={styles.primaryButtonText}>{ questionIndex + 1 < questions.length ? 'NEXT' : 'SEE REPORT CARD' }</Text>
+                  </Pressable>
+                : <Pressable style={[styles.primaryButtonInvert, styles.buttonShadow]}>
+                    <Text style={styles.primaryButtonInvertText}>{ questionIndex + 1 < questions.length ? 'NEXT' : 'SEE REPORT CARD' }</Text>
+                  </Pressable>
+                }
               </View>
             </View>
           }
@@ -300,7 +311,7 @@ const PlayRoomScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 30,
+    paddingHorizontal: 20,
     backgroundColor: '#fff',
     // paddingTop: 50,
   },
@@ -355,6 +366,11 @@ const styles = StyleSheet.create({
   questionFullScreen: {
     height: '85%',
     justifyContent: 'space-between',
+  },
+
+  optionsContainer: {
+    height: '60%',
+    paddingBottom: 20,
   },
 
   question: {
@@ -422,6 +438,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 2,
+    elevation: 8,
   },
 
   primaryButtonInvertText: {
@@ -434,6 +451,13 @@ const styles = StyleSheet.create({
 
   backButton: {
     fontSize: 20,
+  },
+
+  fixedNextButton: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
   },
 });
 
