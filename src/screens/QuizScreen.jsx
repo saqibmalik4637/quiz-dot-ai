@@ -36,6 +36,8 @@ import {
 
 import { selectQuiz } from '../reducers/quizzes/quizSlice';
 
+import { useInterstitialAd, TestIds } from 'react-native-google-mobile-ads';
+
 const QuizScreen = ({ route, navigation }) => {
   const dispatch = useDispatch();
   const { creatingRoom, createdRoom, room } = useSelector(selectRoom);
@@ -46,15 +48,24 @@ const QuizScreen = ({ route, navigation }) => {
   const [favoritedCountState, setFavoritedCountState] = useState(0);
 
   const {
+    isLoaded,
+    isClosed,
+    load,
+    show,
+    error
+  } = useInterstitialAd("ca-app-pub-3081698164560598/7924515371");
+
+  const {
     requestedMarkFavorite,
     requestedUnmarkFavorite,
     quiz
   } = useSelector(selectQuiz);
 
   useEffect(() => {
+    load();
     dispatch(fetchQuizDetailsAction(route.params.quiz.id));
     dispatch(setCreateRoomInitialStateAction());
-  }, [route]);
+  }, [route, load]);
 
   useEffect(() => {
     if (quiz && Object.keys(quiz).length > 0) {
@@ -70,6 +81,7 @@ const QuizScreen = ({ route, navigation }) => {
   }, [currentQuiz]);
 
   const goToPlayRoom = () => {
+    show();
     dispatch(markPlayedAction({quizId: currentQuiz.id}));
     dispatch(setQuestionsInitialStateAction());
     navigation.navigate('PlayRoom', { quiz: currentQuiz, multipleUsers: false });
@@ -157,19 +169,21 @@ const QuizScreen = ({ route, navigation }) => {
             </ScrollView>
           </View>
 
-          <View style={styles.footer}>
-            <Pressable
-              style={[styles.primaryButton, styles.buttonShadow, styles.footerButton]}
-              onPress={goToPlayRoom}>
-              <Text style={styles.primaryButtonText}>LET'S PLAY</Text>
-            </Pressable>
+          { isLoaded &&
+            <View style={styles.footer}>
+              <Pressable
+                style={[styles.primaryButton, styles.buttonShadow, styles.footerButton]}
+                onPress={goToPlayRoom}>
+                <Text style={styles.primaryButtonText}>LET'S PLAY</Text>
+              </Pressable>
 
-            {/*<Pressable
-              style={[styles.primaryButtonInvert, styles.buttonShadow, styles.footerButton]}
-              onPress={createRoom}>
-              <Text style={styles.primaryButtonInvertText}>Play with Friends</Text>
-            </Pressable>*/}
-          </View>
+              {/*<Pressable
+                style={[styles.primaryButtonInvert, styles.buttonShadow, styles.footerButton]}
+                onPress={createRoom}>
+                <Text style={styles.primaryButtonInvertText}>Play with Friends</Text>
+              </Pressable>*/}
+            </View>
+          }
         </View>
       }
     </>

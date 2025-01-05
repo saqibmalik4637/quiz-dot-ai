@@ -1,53 +1,79 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { StyleSheet, View, ActivityIndicator, Image, Button } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, Image } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
-
-import { useVideoPlayer, VideoView } from 'expo-video';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { getToken } from '../config/token';
-
 import { fetchCurrentUserAction } from '../reducers/users/userAction';
 import { selectCurrentUser, selectFetchedCurrentUser } from '../reducers/users/userSlice';
-
 import { fetchCarouselsAction } from '../reducers/carousels/carouselAction';
 import { selectCarousels } from '../reducers/carousels/carouselSlice';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import { softStartupSound } from '../media';
+import { loadPlayer, playPlayer, stopPlayer } from '../SoundService';
 
 const LoadingScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const currentUser = useSelector(selectCurrentUser);
   const fetchedCurrentUser = useSelector(selectFetchedCurrentUser);
   const carousels = useSelector(selectCarousels);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isSoundLoaded, setIsSoundLoaded] = useState(false);
+  const [sound, setSound] = useState(null);
+
+  const loadingLogo = require('../../assets/loading-logo1.gif');
 
   useEffect(() => {
-    getToken().then((res) => {
-      if (res !== null) {
-        dispatch(fetchCurrentUserAction());
-      } else {
-        navigation.navigate('Welcome');
+    loadPlayer(softStartupSound, setSound, setIsSoundLoaded);
+
+    // Cleanup
+    return () => {
+      if (sound) {
+        sound.unloadAsync();
       }
-    })
-  }, [getToken]);
+    };
+  }, []);
 
   useEffect(() => {
-    if (fetchedCurrentUser && (currentUser && Object.keys(currentUser).length > 0)) {
-      dispatch(fetchCarouselsAction());
-    } else if (fetchedCurrentUser && (!currentUser || (currentUser && Object.keys(currentUser).length === 0))) {
-      AsyncStorage.removeItem('token');
-      navigation.navigate('Signup')
+    let isMounted = true;
+    if (isMounted && isSoundLoaded) {
+      playPlayer(sound);
+      const timeout = setTimeout(() => {
+        stopPlayer(sound);
+        getToken().then((res) => {
+          if (res !== null) {
+            dispatch(fetchCurrentUserAction());
+          } else {
+            navigation.navigate('Welcome');
+          }
+        });
+      }, 3000);
+
+      return () => {
+        isMounted = false
+        clearTimeout(timeout)
+      }
     }
-  }, [fetchedCurrentUser, currentUser]);
+  }, [isSoundLoaded, dispatch, navigation, getToken]);
 
   useEffect(() => {
-    if (fetchedCurrentUser && (carousels && carousels.length > 0)) {
+    let isMounted = true;
+    if (isMounted && fetchedCurrentUser && currentUser && Object.keys(currentUser).length > 0) {
       navigation.navigate('Home');
+    } else if (
+      isMounted && fetchedCurrentUser &&
+      (!currentUser || (currentUser && Object.keys(currentUser).length === 0))
+    ) {
+      AsyncStorage.removeItem('token');
+      navigation.navigate('Welcome');
     }
-  }, [fetchedCurrentUser, carousels]);
+    return () => {
+      isMounted = false;
+    };
+  }, [fetchedCurrentUser, currentUser, dispatch, navigation]);
 
   return (
     <View style={styles.container}>
-      <Image style={styles.logo} source={require('../../assets/loading-logo.gif')} />
+      <Image style={styles.logo} source={loadingLogo} />
     </View>
   );
 };
@@ -61,8 +87,8 @@ const styles = StyleSheet.create({
   },
   logo: {
     resizeMode: 'contain',
-    width: '100%'
-  }
+    width: '100%',
+  },
 });
 
 export default LoadingScreen;

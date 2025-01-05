@@ -7,6 +7,8 @@ import questionReducer from './reducers/questions/questionSlice';
 import userReducer from './reducers/users/userSlice';
 import reportCardReducer from './reducers/report_cards/reportCardSlice';
 import roomReducer from './reducers/rooms/roomSlice';
+import interestsReducer from './reducers/interests/interestsSlice';
+import userInterestsReducer from './reducers/user_interests/userInterestsSlice';
 
 export default configureStore({
   reducer: {
@@ -18,5 +20,7 @@ export default configureStore({
     user: userReducer,
     reportCard: reportCardReducer,
     room: roomReducer,
+    interests: interestsReducer,
+    userInterests: userInterestsReducer
   },
 });

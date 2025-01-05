@@ -3,19 +3,25 @@ import { StyleSheet, View, Pressable, Text } from 'react-native';
 import PagerView from 'react-native-pager-view';
 import WelcomeSlide from '../components/WelcomeSlide';
 
+import {
+  boyGirlAnimatedOne,
+  boyGirlAnimatedTwo,
+  threePersonAnimated
+} from '../media'
+
 const WelcomeScreen = ({ navigation }) => {
   const slideContents = [
     {
       text: 'Dive into exciting quizzes and explore your favorite topics!',
-      image: require('../../assets/slide-one.png'),
+      image: boyGirlAnimatedOne,
     },
     {
       text: 'Test your knowledge across categories that spark your curiosity!',
-      image: require('../../assets/slide-two.png'),
+      image: boyGirlAnimatedTwo,
     },
     {
       text: "From science to cinema, there's a quiz here just for you!",
-      image: require('../../assets/slide-three.png'),
+      image: threePersonAnimated,
     },
   ];
 

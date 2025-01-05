@@ -14,7 +14,30 @@ import { selectReportCard } from '../reducers/report_cards/reportCardSlice';
 import * as Progress from 'react-native-progress';
 import { useInterstitialAd, TestIds } from 'react-native-google-mobile-ads';
 
+import { loadPlayer, playPlayer, stopPlayer } from '../SoundService';
+
+import {
+  openingSound,
+  correctSound,
+  errorSound,
+  warningSound,
+  interfaceWelcomeSound,
+  humanCorrectSound
+} from '../media';
+
 const PlayRoomScreen = ({ route, navigation }) => {
+  const [musicPlayer, setMusicPlayer] = useState(null);
+  const [interfacePlayer, setInterfacePlayer] = useState(null);
+  const [correctPlayer, setCorrectPlayer] = useState(null);
+  const [errorPlayer, setErrorPlayer] = useState(null);
+  const [warningPlayer, setWarningPlayer] = useState(null);
+
+  const [musicPlayerLoaded, setMusicPlayerLoaded] = useState(false);
+  const [interfacePlayerLoaded, setInterfacePlayerLoaded] = useState(false);
+  const [correctPlayerLoaded, setCorrectPlayerLoaded] = useState(false);
+  const [errorPlayerLoaded, setErrorPlayerLoaded] = useState(false);
+  const [warningPlayerLoaded, setWarningPlayerLoaded] = useState(false);
+
   const { isLoaded, isClosed, load, show, error } = useInterstitialAd("ca-app-pub-3081698164560598/7924515371");
   const totalTime = 20 * 1000;
 
@@ -87,6 +110,12 @@ const PlayRoomScreen = ({ route, navigation }) => {
   }, [error]);
 
   useEffect(() => {
+    loadPlayer(openingSound, setMusicPlayer, setMusicPlayerLoaded);
+    loadPlayer(interfaceWelcomeSound, setInterfacePlayer, setInterfacePlayerLoaded);
+    loadPlayer(humanCorrectSound, setCorrectPlayer, setCorrectPlayerLoaded);
+    loadPlayer(errorSound, setErrorPlayer, setErrorPlayerLoaded);
+    loadPlayer(warningSound, setWarningPlayer, setWarningPlayerLoaded);
+
     dispatch(createReportCardReportCardInitialStateAction());
     setQuiz(route.params.quiz);
     load();
@@ -116,6 +145,7 @@ const PlayRoomScreen = ({ route, navigation }) => {
 
   useEffect(() => {
     if (currentQuestion) {
+      // playPlayer(musicPlayer);
       setRunTimer(true);
     }
   }, [currentQuestion]);
@@ -145,6 +175,7 @@ const PlayRoomScreen = ({ route, navigation }) => {
         setTimeTakenTracker(setTimeout(() => { setTimeTaken(timeTaken + 1000) }, 1000));
       } else {
         setStopTimer(true);
+        playPlayer(warningPlayer);
         setTimeOver(true);
       }
     }
@@ -155,8 +186,10 @@ const PlayRoomScreen = ({ route, navigation }) => {
       setStopTimer(true);
 
       if (userAnswer.id === correctAnswer.id) {
+        playPlayer(correctPlayer);
         setResult('correct');
       } else {
+        playPlayer(errorPlayer);
         setResult('incorrect');
       }
     }
@@ -198,7 +231,6 @@ const PlayRoomScreen = ({ route, navigation }) => {
   }, [result]);
 
   useEffect(() => {
-    console.log("isLoaded", isLoaded)
     if (finalResult && Object.keys(finalResult).length > 0 && isLoaded) {
       createReportCard();
       show();

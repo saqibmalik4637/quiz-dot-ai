@@ -2,17 +2,21 @@ import React, { useState, useEffect } from 'react';
 
 import {
   StyleSheet, Text, ScrollView, View, TextInput, Pressable,
-  Alert, KeyboardAvoidingView, Platform
+  Alert, KeyboardAvoidingView, Platform, TouchableOpacity
 } from 'react-native';
 
 import { useSelector, useDispatch } from "react-redux";
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { CountryPicker } from "react-native-country-codes-picker";
+import * as Location from 'expo-location';
 
 import { fetchCurrentUserAction, createUserAction } from '../reducers/users/userAction';
 import { selectCurrentUser, selectFetchedCurrentUser, selectUserToken } from '../reducers/users/userSlice';
 import { fetchCarouselsAction } from '../reducers/carousels/carouselAction';
 import { selectCarousels } from '../reducers/carousels/carouselSlice';
-
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { setInitialStateCreateUserInterest } from '../reducers/user_interests/userInterestsAction';
+import { selectUserInterests } from '../reducers/user_interests/userInterestsSlice';
 
 const SignupScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -20,10 +24,24 @@ const SignupScreen = ({ navigation }) => {
   const currentUser = useSelector(selectCurrentUser);
   const fetchedCurrentUser = useSelector(selectFetchedCurrentUser);
   const carousels = useSelector(selectCarousels);
+  const userInterestSlice = useSelector(selectUserInterests);
+
+  const { createdUserInterest } = userInterestSlice;
 
   const [tokenStored, setTokenStored] = useState(false);
   const [fullname, setFullname] = useState('');
   const [age, setAge] = useState('');
+
+  const [showCountryInput, setShowCountryInput] = useState(false);
+  const [countryCode, setCountryCode] = useState('');
+  const [countryName, setCountryName] = useState('');
+  const [showCountryPicker, setShowCountryPicker] = useState(false);
+
+  const [location, setLocation] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState({ fullname: '', age: '' });
 
   const _storeToken = async (token) => {
     try {
@@ -33,16 +51,73 @@ const SignupScreen = ({ navigation }) => {
     }
   };
 
-  const redirectToHome = () => {
-    navigation.navigate('Home');
+  const validateForm = () => {
+    const newErrors = {};
+    if (!fullname.trim()) {
+      newErrors.fullname = 'Name is required.';
+    } else if (fullname.trim().length < 3) {
+      newErrors.fullname = 'Name must be at least 3 characters.';
+    }
+
+    const parsedAge = parseInt(age, 10);
+    if (!age) {
+      newErrors.age = 'Age is required.';
+    } else if (isNaN(parsedAge) || parsedAge < 10 || parsedAge > 100) {
+      newErrors.age = 'Enter a valid age (5–100).';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
-    dispatch(createUserAction({
-      fullname: fullname,
-      age: age,
-    }));
+  const handleSubmit = async () => {
+    if (!validateForm()) return;
+
+    setIsSubmitting(true);
+
+    try {
+      await dispatch(
+        createUserAction({
+          fullname: fullname.trim(),
+          age: age.trim(),
+          country_code: countryCode,
+        })
+      );
+    } catch (error) {
+      Alert.alert('Error', 'Something went wrong. Please try again.');
+    }
   };
+
+  useEffect(() => {
+    async function getCurrentLocation() {
+      
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setErrorMsg('Permission to access location was denied');
+        setShowCountryInput(true);
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location);
+
+      const geocode = await Location.reverseGeocodeAsync({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      });
+
+      if (geocode && geocode[0]) {
+        setCountryCode(geocode[0].isoCountryCode)
+        setCountryName(geocode[0].country);
+        setShowCountryInput(false);
+      } else {
+        setShowCountryInput(true);
+      }
+    }
+
+    getCurrentLocation();
+    dispatch(setInitialStateCreateUserInterest());
+  }, []);
 
   useEffect(() => {
     if (userToken) {
@@ -58,16 +133,10 @@ const SignupScreen = ({ navigation }) => {
   }, [tokenStored]);
 
   useEffect(() => {
-    if (fetchedCurrentUser && currentUser && Object.keys(currentUser).length > 0) {
-      dispatch(fetchCarouselsAction());
+    if (!createdUserInterest && fetchedCurrentUser && currentUser && Object.keys(currentUser).length > 0) {
+      navigation.navigate('Interests');
     }
-  }, [fetchedCurrentUser, currentUser]);
-
-  useEffect(() => {
-    if (carousels && carousels.length > 0) {
-      navigation.navigate('Home');
-    }
-  }, [carousels]);
+  }, [fetchedCurrentUser, currentUser, createdUserInterest]);
 
   return (
     <KeyboardAvoidingView
@@ -102,6 +171,7 @@ const SignupScreen = ({ navigation }) => {
               placeholder="Enter your name"
               placeholderTextColor="#888"
             />
+            {errors.fullname ? <Text style={styles.errorText}>{errors.fullname}</Text> : null}
           </View>
 
           <View style={styles.inputGroup}>
@@ -114,12 +184,46 @@ const SignupScreen = ({ navigation }) => {
               placeholder="Enter your age"
               placeholderTextColor="#888"
             />
+            {errors.age ? <Text style={styles.errorText}>{errors.age}</Text> : null}
           </View>
 
+          { showCountryInput &&
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>Country</Text>
+
+              <TouchableOpacity
+                onPress={() => setShowCountryPicker(true)}
+                style={styles.textInput}
+              >
+                <Text style={{fontSize: 18}}>
+                  {countryName}
+                </Text>
+              </TouchableOpacity>
+
+              <CountryPicker
+                style={{paddingTop: 50}}
+                show={showCountryPicker}
+                pickerButtonOnPress={(item) => {
+                  setCountryCode(item.code);
+                  setCountryName(item.name.en);
+                  setShowCountryPicker(false);
+                }}
+                popularCountries={['en', 'in', 'us']}
+              />
+            </View>
+          }
+
           <Pressable
-            style={[styles.primaryButton, styles.buttonShadow]}
-            onPress={handleSubmit}>
-            <Text style={styles.primaryButtonText}>Let's Play</Text>
+            style={[
+              styles.primaryButton,
+              isSubmitting && { backgroundColor: '#999' },
+            ]}
+            onPress={handleSubmit}
+            disabled={isSubmitting}
+          >
+            <Text style={styles.primaryButtonText}>
+              {isSubmitting ? 'Moment...' : "Let's Play"}
+            </Text>
           </Pressable>
         </View>
       </ScrollView>
@@ -219,6 +323,13 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 5,
     elevation: 8,
+  },
+
+  errorText: {
+    color: 'red',
+    fontSize: 14,
+    marginTop: -15,
+    marginBottom: 10,
   },
 });
 

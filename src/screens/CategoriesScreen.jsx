@@ -27,7 +27,6 @@ const CategoriesScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 10,
-    paddingVertical: 50,
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',

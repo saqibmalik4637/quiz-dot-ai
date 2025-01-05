@@ -16,6 +16,7 @@ import JoiningRoomScreen from './screens/JoiningRoomScreen';
 import PlayRoomScreen from './screens/PlayRoomScreen';
 import ResultScreen from './screens/ResultScreen';
 import PrivacyPolicyScreen from './screens/PrivacyPolicyScreen';
+import InterestsScreen from './screens/InterestsScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -24,8 +25,9 @@ const Navigation = () => {
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Loading">
         <Stack.Screen name="Loading" component={LoadingScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="Signup" component={SignupScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Signup" component={SignupScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Interests" component={InterestsScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Search" component={SearchScreen} options={{ headerShown: false }} />
         <Stack.Screen name="SearchResult" component={SearchResultScreen} options={{ headerShown: false }} />

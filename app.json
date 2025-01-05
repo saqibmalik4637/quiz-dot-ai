@@ -22,7 +22,12 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.saqibmalik.starquiz",
-      "versionCode": 7
+      "versionCode": 7,
+      "permissions": [
+        "RECORD_AUDIO",
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_EXTERNAL_STORAGE"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -35,7 +40,20 @@
     "owner": "saqibmalik",
     "plugins": [
       "expo-build-properties",
-      "expo-video"
+      [
+        "expo-av",
+        {
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location.",
+          "isAndroidBackgroundLocationEnabled": true,
+          "isAndroidForegroundServiceEnabled": true
+        }
+      ]
     ]
   },
   "react-native-google-mobile-ads": {

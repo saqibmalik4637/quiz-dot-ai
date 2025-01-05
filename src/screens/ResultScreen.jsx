@@ -14,9 +14,13 @@ import { selectRoom } from '../reducers/rooms/roomSlice';
 
 import { useInterstitialAd, TestIds } from 'react-native-google-mobile-ads';
 
+import { loadPlayer, playPlayer, stopPlayer } from '../SoundService';
+import {
+  musicboxSound
+} from '../media';
+
 const ResultScreen = ({ route, navigation }) => {
   // const socket = io('https://golden-vast-mongoose.ngrok-free.app');
-
   const dispatch = useDispatch();
 
   const { scoreboard } = useSelector(selectRoom);
@@ -27,6 +31,8 @@ const ResultScreen = ({ route, navigation }) => {
   const [graphData, setGraphData] = useState([]);
   const [room, setRoom] = useState(null);
   const [roomScoreboard, setRoomScoreboard] = useState([]);
+  const [player, setPlayer] = useState(null);
+  const [isPlayerLoaded, setIsPlayerLoaded] = useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -46,10 +52,17 @@ const ResultScreen = ({ route, navigation }) => {
   );
 
   useEffect(() => {
+    loadPlayer(musicboxSound, setPlayer, setIsPlayerLoaded);
     dispatch(createReportCardReportCardInitialStateAction());
     setReportCard(route.params.reportCard);
     // setRoom(route.params.room);
   }, [route]);
+
+  useEffect(() => {
+    if (isPlayerLoaded && player) {
+      playPlayer(player);
+    }
+  }, [player, isPlayerLoaded]);
 
   useEffect(() => {
     if (room && room) {

@@ -1,7 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
-import { StyleSheet, View, Image, ScrollView, Text, TouchableOpacity, TextInput, BackHandler } from 'react-native';
+import { StyleSheet, View, Image, ScrollView, Text, TouchableOpacity,
+         TextInput, BackHandler } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
+
+import { useFocusEffect } from '@react-navigation/native';
+
 import { fetchCarouselsAction } from '../reducers/carousels/carouselAction';
 import { selectCarousels } from '../reducers/carousels/carouselSlice';
 import { joinRoomAction } from '../reducers/rooms/roomAction';
@@ -10,10 +14,16 @@ import { selectRoom } from '../reducers/rooms/roomSlice';
 import QuizCarousel from '../components/carousels/Quizzes';
 import CategoryCarousel from '../components/carousels/Categories';
 
+import { loadPlayer, playPlayer, stopPlayer } from '../SoundService';
+
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import AntDesign from '@expo/vector-icons/AntDesign';
-import { useFocusEffect } from '@react-navigation/native'; // import useFocusEffect for screen focus
+
+import {
+  softViolinMusicSound,
+  boyGirlAnimatedOne,
+} from '../media';
 
 const HomeScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -22,6 +32,9 @@ const HomeScreen = ({ navigation }) => {
   const scrollYRef = useRef(0);
   const [showHeader, setShowHeader] = useState(true);
   const [joiningCode, setJoiningCode] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSoundLoaded, setIsSoundLoaded] = useState(false);
+  const [sound, setSound] = useState(null);
 
   // Disable back navigation to prevent going to previous screens
   useFocusEffect(
@@ -41,14 +54,45 @@ const HomeScreen = ({ navigation }) => {
   );
 
   useEffect(() => {
-    if (carousels.length === 0) {
-      dispatch(fetchCarouselsAction());
-    }
-  }, [dispatch, carousels]);
+    dispatch(fetchCarouselsAction());
 
-  const joinRoom = () => {
-    dispatch(joinRoomAction(joiningCode));
-  };
+    loadPlayer(softViolinMusicSound, setSound, setIsSoundLoaded);
+
+    // Cleanup
+    return () => {
+      if (sound) {
+        sound.unloadAsync();
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isLoading && isSoundLoaded) {
+      playPlayer(sound);
+    }
+  }, [isSoundLoaded, isLoading]);
+
+  useEffect(() => {
+    // Create an array of promises for image preloading
+    const preloadImages = carousels.flatMap((carousel) =>
+      carousel.items.map((item) =>
+        Image.prefetch(item.image_url)
+      )
+    );
+
+    // Wait for all images to load
+    Promise.all(preloadImages)
+      .then(() => {
+        setTimeout(() => {
+          setIsLoading(false);
+          stopPlayer(sound);
+        }, 5000)
+      })
+      .catch((error) => {
+        setIsLoading(false);
+        stopPlayer(sound);
+      });
+  }, [carousels]);
 
   useEffect(() => {
     if (newUserJoined && room) {
@@ -56,58 +100,77 @@ const HomeScreen = ({ navigation }) => {
     }
   }, [newUserJoined, room]);
 
+  const joinRoom = () => {
+    dispatch(joinRoomAction(joiningCode));
+  };
+
   return (
-    <View style={styles.container}>
-      {showHeader && (
+    <>
+      <View style={[styles.loadingWrapper, isLoading ? {} : styles.hide]}>
         <LinearGradient
-          colors={['yellow', '#ffffff']} // Define gradient colors here
+          colors={['yellow', '#ffffff']}
           style={styles.headerGradient}
         >
-          <View style={styles.headerComponent}>
-            <Image style={styles.logo} source={require('../../assets/logo.png')} />
-            <View style={styles.iconContainer}>
-              <TouchableOpacity onPress={() => navigation.navigate('Search')} style={styles.headerButton}>
-                <AntDesign name="search1" color="#ffffff" style={styles.icon} size={28} />
-              </TouchableOpacity>
-
-{/*               <TouchableOpacity onPress={() => navigation.navigate('Search')} style={styles.headerButton}> */}
-{/*                 <AntDesign name="user" color="#ffffff" style={styles.icon} size={28} /> */}
-{/*               </TouchableOpacity> */}
-            </View>
+          <View style={styles.loadingHeader}>
+            <Image style={styles.loadinLogo} source={require('../../assets/logo.png')} />
           </View>
         </LinearGradient>
-      )}
+        <Text style={styles.loadingText}>🍳 Cooking Up Quizzes! 🧠✨</Text>
+        <Image source={boyGirlAnimatedOne} style={styles.loadingImage} />
+      </View>
 
-      {/*<View style={styles.joinRoomContainer}>
-        <Text style={styles.joinRoomHeading}>Play with friends</Text>
-        <Text style={styles.inputLabel}>Enter a room joining code:</Text>
-        <View style={styles.inputGroup}>
-          <TextInput
-            style={styles.textInput}
-            onChangeText={setJoiningCode}
-            value={joiningCode}
-          />
+      <View style={[styles.container, isLoading ? styles.hide : {}]}>
+        {showHeader && (
+          <LinearGradient
+            colors={['yellow', '#ffffff']} // Define gradient colors here
+            style={styles.headerGradient}
+          >
+            <View style={styles.headerComponent}>
+              <Image style={styles.logo} source={require('../../assets/logo.png')} />
+              <View style={styles.iconContainer}>
+                <TouchableOpacity onPress={() => navigation.navigate('Search')} style={styles.headerButton}>
+                  <AntDesign name="search1" color="#ffffff" style={styles.icon} size={28} />
+                </TouchableOpacity>
 
-          <TouchableOpacity style={styles.submitIcon} onPress={joinRoom}>
-            <Text style={styles.buttonText}>Join</Text>
-          </TouchableOpacity>
-        </View>
-      </View>*/}
-
-      {carousels && (
-        <ScrollView showsVerticalScrollIndicator={false}>
-          {carousels.map((carousel, index) => (
-            <View key={index} style={styles.carousel}>
-              {carousel.type === 'QuizCarousel' ? (
-                <QuizCarousel navigation={navigation} carousel={carousel} />
-              ) : (
-                <CategoryCarousel navigation={navigation} carousel={carousel} />
-              )}
+                 {/*<TouchableOpacity onPress={() => navigation.navigate('Search')} style={styles.headerButton}> 
+                   <AntDesign name="user" color="#ffffff" style={styles.icon} size={28} /> 
+                 </TouchableOpacity>*/}
+              </View>
             </View>
-          ))}
-        </ScrollView>
-      )}
-    </View>
+          </LinearGradient>
+        )}
+
+        {/*<View style={styles.joinRoomContainer}>
+          <Text style={styles.joinRoomHeading}>Play with friends</Text>
+          <Text style={styles.inputLabel}>Enter a room joining code:</Text>
+          <View style={styles.inputGroup}>
+            <TextInput
+              style={styles.textInput}
+              onChangeText={setJoiningCode}
+              value={joiningCode}
+            />
+
+            <TouchableOpacity style={styles.submitIcon} onPress={joinRoom}>
+              <Text style={styles.buttonText}>Join</Text>
+            </TouchableOpacity>
+          </View>
+        </View>*/}
+
+        {carousels && (
+          <ScrollView showsVerticalScrollIndicator={false}>
+            {carousels.map((carousel, index) => (
+              <View key={index} style={styles.carousel}>
+                {carousel.type === 'QuizCarousel' ? (
+                  <QuizCarousel navigation={navigation} carousel={carousel} />
+                ) : (
+                  <CategoryCarousel navigation={navigation} carousel={carousel} />
+                )}
+              </View>
+            ))}
+          </ScrollView>
+        )}
+      </View>
+    </>
   );
 };
 
@@ -117,6 +180,36 @@ const styles = StyleSheet.create({
     marginTop: 0,
     backgroundColor: '#ffffff',
     justifyContent: 'start',
+  },
+  loadingWrapper: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+    height: '100%',
+  },
+  hide: {
+    display: 'none'
+  },
+  loadinLogo: {
+    width: 100,
+    resizeMode: 'contain',
+  },
+  loadingHeader: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+  },
+  loadingImage: {
+    width: '100%',
+    height: '70%',
+    resizeMode: 'contain',
+  },
+  loadingText: {
+    color: '#FF8C00',
+    fontSize: 24,
+    textAlign: 'center',
+    marginTop: 20,
+    fontWeight: 'bold'
   },
   carousel: {
     marginBottom: 20,
