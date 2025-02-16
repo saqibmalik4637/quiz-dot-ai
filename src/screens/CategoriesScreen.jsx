@@ -6,18 +6,28 @@ import CategoriesList from '../components/CategoriesList';
 const CategoriesScreen = ({ route, navigation }) => {
   const [title, setTitle] = useState(null);
   const [query, setQuery] = useState(null);
+  const [carouselId, setCarouselId] = useState(null);
 
   useEffect(() => {
     setTitle(route.params.title);
-    setQuery(route.params.query);
+    if (route.params.query) {
+      setQuery(route.params.query);  
+    } else if (route.params.carouselId) {
+      setCarouselId(route.params.carouselId);
+    }
+    
   }, [route]);
 
   return (
     <View style={styles.container}>
-      { (title && query) &&
+      { (title && (query || carouselId)) &&
         <>
           <Header navigation={navigation} title={title} />
-          <CategoriesList navigation={navigation} query={query} />
+          { query ? (<>
+            <CategoriesList navigation={navigation} query={query} />
+          </>) : (<>
+            <CategoriesList navigation={navigation} carouselId={carouselId} />
+          </>) }
         </>
       }
     </View>

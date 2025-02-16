@@ -11,10 +11,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CountryPicker } from "react-native-country-codes-picker";
 import * as Location from 'expo-location';
 
-import { fetchCurrentUserAction, createUserAction } from '../reducers/users/userAction';
-import { selectCurrentUser, selectFetchedCurrentUser, selectUserToken } from '../reducers/users/userSlice';
-import { fetchCarouselsAction } from '../reducers/carousels/carouselAction';
-import { selectCarousels } from '../reducers/carousels/carouselSlice';
+import { createUserAction } from '../reducers/users/userAction';
+import { selectCurrentUser, selectUserToken, selectCreatedUser } from '../reducers/users/userSlice';
+
 import { setInitialStateCreateUserInterest } from '../reducers/user_interests/userInterestsAction';
 import { selectUserInterests } from '../reducers/user_interests/userInterestsSlice';
 
@@ -22,8 +21,7 @@ const SignupScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const userToken = useSelector(selectUserToken);
   const currentUser = useSelector(selectCurrentUser);
-  const fetchedCurrentUser = useSelector(selectFetchedCurrentUser);
-  const carousels = useSelector(selectCarousels);
+  const createdUser = useSelector(selectCreatedUser);
   const userInterestSlice = useSelector(selectUserInterests);
 
   const { createdUserInterest } = userInterestSlice;
@@ -120,6 +118,7 @@ const SignupScreen = ({ navigation }) => {
   }, []);
 
   useEffect(() => {
+    console.log("userToken", userToken);
     if (userToken) {
       _storeToken(userToken);
       setTokenStored(true);
@@ -127,16 +126,13 @@ const SignupScreen = ({ navigation }) => {
   }, [userToken]);
 
   useEffect(() => {
-    if (tokenStored) {
-      dispatch(fetchCurrentUserAction());
-    }
-  }, [tokenStored]);
-
-  useEffect(() => {
-    if (!createdUserInterest && fetchedCurrentUser && currentUser && Object.keys(currentUser).length > 0) {
+    console.log("createdUserInterest", createdUserInterest);
+    console.log("createdUser", createdUser);
+    console.log("currentUser", currentUser);
+    if (!createdUserInterest && createdUser && currentUser && Object.keys(currentUser).length > 0) {
       navigation.navigate('Interests');
     }
-  }, [fetchedCurrentUser, currentUser, createdUserInterest]);
+  }, [createdUser, currentUser, createdUserInterest]);
 
   return (
     <KeyboardAvoidingView

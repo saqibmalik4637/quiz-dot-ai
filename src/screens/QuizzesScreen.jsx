@@ -14,7 +14,13 @@ const QuizzesScreen = ({ route, navigation }) => {
         </View>
         <QuizzesList navigation={navigation} category={route.params.category} />
       </> : <>
-        <QuizzesList navigation={navigation} query={route.params.query} />
+        { route.params.carouse_id ?
+          <>
+            <QuizzesList navigation={navigation} carouse_id={route.params.carouse_id} />
+          </> : <>
+            <QuizzesList navigation={navigation} query={route.params.query} />
+          </>
+        }
       </> }
     </View>
   )

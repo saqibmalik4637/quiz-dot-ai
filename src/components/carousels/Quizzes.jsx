@@ -10,7 +10,7 @@ const Quizzes = ({ navigation, carousel }) => {
     <View style={styles.container}>
       <View style={styles.head}>
         <Text style={styles.topic}>{carousel.title}</Text>
-        <TouchableOpacity style={styles.link} onPress={() => navigation.navigate('Quizzes', { query: carousel.title, title: carousel.title })}>
+        <TouchableOpacity style={styles.link} onPress={() => navigation.navigate('Quizzes', { carousel_id: carousel.id, title: carousel.title })}>
           <Text style={styles.linkText}>View all</Text>
           <AntDesign name="arrowright" size={14} style={styles.linkIcon} />
         </TouchableOpacity>

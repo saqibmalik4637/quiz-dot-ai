@@ -12,7 +12,7 @@ const Categories = ({ navigation, carousel }) => {
         <Text style={styles.topic}>{carousel.title}</Text>
         <TouchableOpacity
           style={styles.link}
-          onPress={() => navigation.navigate('Categories', { title: carousel.title, query: carousel.title })}
+          onPress={() => navigation.navigate('Categories', { title: carousel.title, carouselId: carousel.id })}
         >
           <Text style={styles.linkText}>View all</Text>
           <AntDesign name="arrowright" size={14} style={styles.linkIcon} />

@@ -6,8 +6,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getToken } from '../config/token';
 import { fetchCurrentUserAction } from '../reducers/users/userAction';
 import { selectCurrentUser, selectFetchedCurrentUser } from '../reducers/users/userSlice';
-import { fetchCarouselsAction } from '../reducers/carousels/carouselAction';
-import { selectCarousels } from '../reducers/carousels/carouselSlice';
 
 import { softStartupSound } from '../media';
 import { loadPlayer, playPlayer, stopPlayer } from '../SoundService';
@@ -16,7 +14,6 @@ const LoadingScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const currentUser = useSelector(selectCurrentUser);
   const fetchedCurrentUser = useSelector(selectFetchedCurrentUser);
-  const carousels = useSelector(selectCarousels);
   const [isSoundLoaded, setIsSoundLoaded] = useState(false);
   const [sound, setSound] = useState(null);
 
@@ -58,7 +55,11 @@ const LoadingScreen = ({ navigation }) => {
   useEffect(() => {
     let isMounted = true;
     if (isMounted && fetchedCurrentUser && currentUser && Object.keys(currentUser).length > 0) {
-      navigation.navigate('Home');
+      if (currentUser.has_interests) {
+        navigation.navigate('Home');
+      } else {
+        navigation.navigate('Interests');
+      }
     } else if (
       isMounted && fetchedCurrentUser &&
       (!currentUser || (currentUser && Object.keys(currentUser).length === 0))

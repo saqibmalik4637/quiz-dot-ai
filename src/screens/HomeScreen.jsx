@@ -92,7 +92,7 @@ const HomeScreen = ({ navigation }) => {
         setIsLoading(false);
         stopPlayer(sound);
       });
-  }, [carousels]);
+  }, [carousels, sound, setIsLoading, stopPlayer]);
 
   useEffect(() => {
     if (newUserJoined && room) {
@@ -160,11 +160,15 @@ const HomeScreen = ({ navigation }) => {
           <ScrollView showsVerticalScrollIndicator={false}>
             {carousels.map((carousel, index) => (
               <View key={index} style={styles.carousel}>
-                {carousel.type === 'QuizCarousel' ? (
-                  <QuizCarousel navigation={navigation} carousel={carousel} />
-                ) : (
-                  <CategoryCarousel navigation={navigation} carousel={carousel} />
-                )}
+                { carousel.items.length > 2 &&
+                  <>
+                    { carousel.type === 'QuizCarousel' ? (
+                      <QuizCarousel navigation={navigation} carousel={carousel} />
+                    ) : (
+                      <CategoryCarousel navigation={navigation} carousel={carousel} />
+                    )}
+                  </>
+                }
               </View>
             ))}
           </ScrollView>

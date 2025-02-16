@@ -5,20 +5,12 @@ import { useSelector, useDispatch } from 'react-redux';
 import QuizzesList from '../components/QuizzesList';
 import CategoriesList from '../components/CategoriesList';
 
-import { fetchQuizzesAction } from '../reducers/quizzes/quizAction';
-import { selectQuiz } from '../reducers/quizzes/quizSlice';
-
-import { fetchCategoriesAction } from '../reducers/categories/categoryAction';
-import { selectCategories } from '../reducers/categories/categorySlice';
-
 import AntDesign from '@expo/vector-icons/AntDesign';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 
 const SearchResultScreen = ({ route, navigation }) => {
   const [query, setQuery] = useState(route.params.query);
   const dispatch = useDispatch();
-  const categories = useSelector(selectCategories);
-  const { quizzes } = useSelector(selectQuiz);
 
   const [resultFor, setResultFor] = useState('Quizzes');
 

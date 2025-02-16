@@ -4,13 +4,15 @@ import { useSelector, useDispatch } from 'react-redux';
 import { fetchQuizzesAction } from '../reducers/quizzes/quizAction';
 import { selectQuiz } from '../reducers/quizzes/quizSlice';
 
-const QuizzesList = ({ navigation, category, query }) => {
+const QuizzesList = ({ navigation, category, carouse_id, query }) => {
   const { quizzes } = useSelector(selectQuiz);
   const dispatch = useDispatch()
 
   useEffect(() => {
     if (category) {
       dispatch(fetchQuizzesAction({categoryId: category.id}));
+    } else if (carouse_id) {
+      dispatch(fetchQuizzesAction({carouselId: carouse_id}));
     } else {
       dispatch(fetchQuizzesAction({query: query}));
     }

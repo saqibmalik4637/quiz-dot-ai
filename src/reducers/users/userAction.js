@@ -19,7 +19,7 @@ export const createUserAction = (body) => async (dispatch) => {
   const res = await postRequest('/api/v1/users', body);
 
   if (res.status === 200) {
-    dispatch(createUser({ token: res.data.token, error: '' }));
+    dispatch(createUser({ token: res.data.token, user: res.data.user, error: '' }));
   } else {
     dispatch(createUser({ token: null, error: 'Unable to create user' }));
   }

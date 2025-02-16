@@ -46,6 +46,7 @@ const QuizScreen = ({ route, navigation }) => {
   const [createRoomCalled, setCreateRoomCalled] = useState(false);
   const [isFavoritedState, setIsFavoritedState] = useState(false);
   const [favoritedCountState, setFavoritedCountState] = useState(0);
+  const [adLoaded, setAdLoaded] = useState(false);
 
   const {
     isLoaded,
@@ -65,6 +66,9 @@ const QuizScreen = ({ route, navigation }) => {
     load();
     dispatch(fetchQuizDetailsAction(route.params.quiz.id));
     dispatch(setCreateRoomInitialStateAction());
+    setTimeout(() => {
+      setAdLoaded(true);
+    }, 5000);
   }, [route, load]);
 
   useEffect(() => {
@@ -81,7 +85,8 @@ const QuizScreen = ({ route, navigation }) => {
   }, [currentQuiz]);
 
   const goToPlayRoom = () => {
-    show();
+    if (isLoaded) show();
+
     dispatch(markPlayedAction({quizId: currentQuiz.id}));
     dispatch(setQuestionsInitialStateAction());
     navigation.navigate('PlayRoom', { quiz: currentQuiz, multipleUsers: false });
@@ -111,6 +116,12 @@ const QuizScreen = ({ route, navigation }) => {
       navigation.navigate('JoiningRoom', { room: room })
     }
   }, [creatingRoom, createdRoom, room, createRoomCalled]);
+
+  useEffect(() => {
+    if (isLoaded) {
+      setAdLoaded(true)
+    }
+  }, [isLoaded]);
 
   return (
     <>
@@ -169,20 +180,34 @@ const QuizScreen = ({ route, navigation }) => {
             </ScrollView>
           </View>
 
-          { isLoaded &&
-            <View style={styles.footer}>
-              <Pressable
-                style={[styles.primaryButton, styles.buttonShadow, styles.footerButton]}
-                onPress={goToPlayRoom}>
-                <Text style={styles.primaryButtonText}>LET'S PLAY</Text>
-              </Pressable>
+          { adLoaded ? (
+              <View style={styles.footer}>
+                <Pressable
+                  style={[styles.primaryButton, styles.buttonShadow, styles.footerButton]}
+                  onPress={goToPlayRoom}>
+                  <Text style={styles.primaryButtonText}>LET'S PLAY</Text>
+                </Pressable>
 
-              {/*<Pressable
-                style={[styles.primaryButtonInvert, styles.buttonShadow, styles.footerButton]}
-                onPress={createRoom}>
-                <Text style={styles.primaryButtonInvertText}>Play with Friends</Text>
-              </Pressable>*/}
-            </View>
+                {/*<Pressable
+                  style={[styles.primaryButtonInvert, styles.buttonShadow, styles.footerButton]}
+                  onPress={createRoom}>
+                  <Text style={styles.primaryButtonInvertText}>Play with Friends</Text>
+                </Pressable>*/}
+              </View>
+            ) : (
+              <View style={styles.footer}>
+                <Pressable
+                  style={[styles.primaryButton, styles.buttonShadow, styles.footerButton]}>
+                  <Text style={styles.primaryButtonText}>Loading...</Text>
+                </Pressable>
+
+                {/*<Pressable
+                  style={[styles.primaryButtonInvert, styles.buttonShadow, styles.footerButton]}
+                  onPress={createRoom}>
+                  <Text style={styles.primaryButtonInvertText}>Play with Friends</Text>
+                </Pressable>*/}
+              </View>
+            )
           }
         </View>
       }

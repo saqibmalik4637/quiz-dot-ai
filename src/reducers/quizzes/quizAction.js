@@ -9,10 +9,12 @@ import {
 } from './quizSlice';
 import { getRequestWithToken, postRequestWithToken } from '../../config/apiRequest';
 
-export const fetchQuizzesAction = ({categoryId, query}) => async (dispatch) => {
+export const fetchQuizzesAction = ({categoryId, carouselId, query}) => async (dispatch) => {
   let res
   if (categoryId) {
     res = await getRequestWithToken(`/api/v1/categories/${categoryId}/quizzes`, {});
+  } else if (carouselId) {
+    res = await getRequestWithToken(`/api/v1/quizzes`, { carousel_id: carouselId });
   } else {
     res = await getRequestWithToken(`/api/v1/quizzes`, { query: query });
   }

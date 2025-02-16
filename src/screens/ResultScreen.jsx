@@ -37,6 +37,10 @@ const ResultScreen = ({ route, navigation }) => {
   useFocusEffect(
     React.useCallback(() => {
       const onBackPress = () => {
+        if (player) {
+          stopPlayer(player);
+        }
+
         navigation.navigate('Home');
         return true; // Prevents going back
       };
@@ -79,6 +83,14 @@ const ResultScreen = ({ route, navigation }) => {
       setRoomScoreboard(scoreboard);
     }
   }, [scoreboard]);
+
+  const redirectToHome = () => {
+    if (player) {
+      stopPlayer(player);
+    }
+
+    navigation.navigate('Home')
+  }
 
   return (
     <View style={styles.container} showsVerticalScrollIndicator={false}>
@@ -144,7 +156,7 @@ const ResultScreen = ({ route, navigation }) => {
           </ScrollView>
         }
         <View style={styles.footerButton}>
-          <Pressable style={[styles.primaryButton, styles.buttonShadow]} onPress={() => navigation.navigate('Home')}>
+          <Pressable style={[styles.primaryButton, styles.buttonShadow]} onPress={() => redirectToHome()}>
             <Text style={styles.primaryButtonText}>GO TO HOME</Text>
           </Pressable>
         </View>

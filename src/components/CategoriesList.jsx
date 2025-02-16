@@ -4,12 +4,16 @@ import { useSelector, useDispatch } from 'react-redux';
 import { fetchCategoriesAction } from '../reducers/categories/categoryAction';
 import { selectCategories } from '../reducers/categories/categorySlice';
 
-const CategoriesList = ({ navigation, query }) => {
+const CategoriesList = ({ navigation, query, carouselId }) => {
   const categories = useSelector(selectCategories);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(fetchCategoriesAction(query));
+    if (query) {
+      dispatch(fetchCategoriesAction({query: query}));
+    } else if (carouselId) {
+      dispatch(fetchCategoriesAction({carouselId: carouselId}));
+    }
   }, [dispatch, fetchCategoriesAction])
 
   return (

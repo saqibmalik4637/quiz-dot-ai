@@ -127,7 +127,7 @@ const PlayRoomScreen = ({ route, navigation }) => {
 
   useEffect(() => {
     if (quiz && Object.keys(quiz).length > 0) {
-      dispatch(fetchQuestionsAction({quizId: quiz.id}));
+      dispatch(fetchQuestionsAction({quizId: quiz.id, limit: quiz.questions_count}));
     }
   }, [quiz]);
 

@@ -24,10 +24,11 @@ export const userSlice = createSlice({
       state.fetchedCurrentUser = true
     },
     createUser: (state, action) => {
+      state.currentUser = action.payload.user
       state.userToken = action.payload.token
       state.createUserError = action.payload.error
       state.creatingUser = false
-      state.createdUser = false
+      state.createdUser = true
     }
   }
 });
@@ -36,4 +37,5 @@ export const { fetchCurrentUser, createUser } = userSlice.actions
 export const selectCurrentUser = (state) => state.user.currentUser
 export const selectFetchedCurrentUser = (state) => state.user.fetchedCurrentUser
 export const selectUserToken = (state) => state.user.userToken
+export const selectCreatedUser = (state) => state.user.createdUser
 export default userSlice.reducer

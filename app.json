@@ -22,7 +22,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.saqibmalik.starquiz",
-      "versionCode": 7,
+      "versionCode": 8,
       "permissions": [
         "RECORD_AUDIO",
         "WRITE_EXTERNAL_STORAGE",
