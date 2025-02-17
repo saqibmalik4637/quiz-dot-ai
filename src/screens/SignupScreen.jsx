@@ -9,7 +9,6 @@ import { useSelector, useDispatch } from "react-redux";
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CountryPicker } from "react-native-country-codes-picker";
-import * as Location from 'expo-location';
 
 import { createUserAction } from '../reducers/users/userAction';
 import { selectCurrentUser, selectUserToken, selectCreatedUser } from '../reducers/users/userSlice';
@@ -30,7 +29,7 @@ const SignupScreen = ({ navigation }) => {
   const [fullname, setFullname] = useState('');
   const [age, setAge] = useState('');
 
-  const [showCountryInput, setShowCountryInput] = useState(false);
+  const [showCountryInput, setShowCountryInput] = useState(true);
   const [countryCode, setCountryCode] = useState('');
   const [countryName, setCountryName] = useState('');
   const [showCountryPicker, setShowCountryPicker] = useState(false);
@@ -87,33 +86,9 @@ const SignupScreen = ({ navigation }) => {
   };
 
   useEffect(() => {
-    async function getCurrentLocation() {
-      
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
-        setShowCountryInput(true);
-        return;
-      }
+    setCountryCode('IN')
+    setCountryName('India');
 
-      let location = await Location.getCurrentPositionAsync({});
-      setLocation(location);
-
-      const geocode = await Location.reverseGeocodeAsync({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-      });
-
-      if (geocode && geocode[0]) {
-        setCountryCode(geocode[0].isoCountryCode)
-        setCountryName(geocode[0].country);
-        setShowCountryInput(false);
-      } else {
-        setShowCountryInput(true);
-      }
-    }
-
-    getCurrentLocation();
     dispatch(setInitialStateCreateUserInterest());
   }, []);
 
